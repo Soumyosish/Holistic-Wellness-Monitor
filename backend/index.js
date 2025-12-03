@@ -18,9 +18,9 @@ app.get('/', (req, res) => {
   res.send('Hollistic Wellness Monitor backend is running!');
 });
 // 404 handler
-app.use((req, res) => {
-  res.status(404).json({ error: 'Not found' });
-});
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// app.use((req, res) => {
+//   res.status(404).json({ error: 'Not found' });
+// });
+// app.listen(PORT, () => {
+//   console.log(`Server running on port ${PORT}`);
+// });
