@@ -1,11 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import email from "../assets/email.jpg";
-import {
-  HashRouter as Router,
-  Routes,
-  Route,
-  useNavigate,
-} from "react-router-dom";
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import {
   LayoutDashboard,
   Activity,
@@ -982,18 +979,19 @@ const FAQSection = () => {
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [activeNav, setActiveNav] = useState("home");
 
   const handleGetStarted = () => {
-    alert(
-      "Login/Signup functionality will be implemented soon! For now, you can explore the dashboard by clicking on 'Dashboard' in the navigation."
-    );
+    if (user) {
+      navigate("/dashboard");
+    } else {
+      navigate("/register");
+    }
   };
 
   const handleSignIn = () => {
-    alert(
-      "Sign In functionality will be implemented soon! Please click on 'Dashboard' to explore the app."
-    );
+    navigate("/login");
   };
 
   const scrollToSection = (sectionId) => {
@@ -1012,7 +1010,47 @@ const LandingPage = () => {
       }
     }
   };
-
+  const renderAuthButtons = () => {
+    if (user) {
+      return (
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-linear-to-tr from-sky-400 to-indigo-400 flex items-center justify-center text-xs font-semibold text-white">
+              {user.name?.charAt(0)}
+            </div>
+            <span className="text-sm font-medium text-gray-300">
+              {user.name}
+            </span>
+          </div>
+          <Button
+            size="sm"
+            onClick={() => navigate("/dashboard")}
+            className="relative overflow-hidden group"
+          >
+            <span className="relative z-10">Dashboard</span>
+          </Button>
+        </div>
+      );
+    } else {
+      return (
+        <div className="flex items-center gap-4">
+          <button
+            className="text-sm font-medium text-gray-300 hover:text-orange-400 transition-colors px-4 py-2 rounded-full hover:bg-white/5"
+            onClick={handleSignIn}
+          >
+            Sign In
+          </button>
+          <Button
+            size="sm"
+            onClick={handleGetStarted}
+            className="relative overflow-hidden group"
+          >
+            <span className="relative z-10">Get Started</span>
+          </Button>
+        </div>
+      );
+    }
+  };
   return (
     <div className="min-h-screen bg-[#050505] text-white selection:bg-orange-500/30 font-sans overflow-x-hidden">
       {/* Navbar */}
@@ -1046,7 +1084,11 @@ const LandingPage = () => {
                 key={item.id}
                 onClick={() => {
                   if (item.id === "dashboard") {
-                    navigate("/dashboard");
+                    if (user) {
+                      navigate("/dashboard");
+                    } else {
+                      navigate("/login");
+                    }
                     window.scrollTo({ top: 0, behavior: "smooth" });
                   } else {
                     scrollToSection(item.id);
@@ -1065,8 +1107,8 @@ const LandingPage = () => {
               </button>
             ))}
           </div>
-
-          <div className="flex items-center gap-4">
+          {renderAuthButtons()}
+          {/* <div className="flex items-center gap-4">
             <button
               className="text-sm font-medium text-gray-300 hover:text-orange-400 transition-colors px-4 py-2 rounded-full hover:bg-white/5"
               onClick={handleSignIn}
@@ -1081,7 +1123,7 @@ const LandingPage = () => {
               <span className="relative z-10">Get Started</span>
               <span className="absolute inset-0 bg-linear-to-r from-orange-600 to-orange-700 translate-x-full group-hover:translate-x-0 transition-transform duration-300"></span>
             </Button>
-          </div>
+          </div> */}
         </div>
       </nav>
 

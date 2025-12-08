@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
 import Navbar from "./Navbar";
 import BMICalculator from "./BMICalculator";
 import HealthOverview from "./HealthOverview";
@@ -8,9 +9,10 @@ import ScrollToTop from "./ScrollToTop";
 import "../index.css";
 function DashBoard() {
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const { user, logout } = useAuth();
   return (
     <div className="min-h-screen bg-linear-to-br from-sky-100 via-indigo-100 to-violet-100">
-      <Navbar />
+      <Navbar user={user} logout={logout} />
       <main className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
         <div className="grid grid-cols-1 lg:grid-cols-[5fr_7fr] gap-6 lg:gap-6">
           <div className="flex">

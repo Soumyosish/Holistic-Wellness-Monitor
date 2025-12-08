@@ -1,11 +1,13 @@
-// index.js
-import express from "express";
 import dotenv from "dotenv";
+dotenv.config();
+
+import express from "express";
 import connectDb from "./config/db.js";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import cors from "cors";
+import googleAuthRoutes from "./routes/googleAuthRoutes.js";
 
 import { notFound, errorHandler } from "./middlewares/errorMiddleware.js";
 
@@ -14,22 +16,22 @@ import mealRoutes from "./routes/mealRoutes.js";
 import workoutRoutes from "./routes/workoutRoutes.js";
 import summaryRoutes from "./routes/summaryRoutes.js";
 
-dotenv.config();
-
 const app = express();
 const port = process.env.PORT || 3000;
 
-// ---- Basic parsers
 app.use(express.json());
 app.use(cookieParser());
 
-// ---- SECURITY MIDDLEWARES (apply BEFORE routes)
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
     credentials: true,
   })
 );
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
 app.use(helmet());
 
 const limiter = rateLimit({
@@ -40,6 +42,7 @@ app.use(limiter);
 
 // ---- ROUTES
 app.use("/api/auth", authRoutes);
+app.use("/api/auth", googleAuthRoutes);
 app.use("/api/meals", mealRoutes);
 app.use("/api/workouts", workoutRoutes);
 app.use("/api/summary", summaryRoutes);
