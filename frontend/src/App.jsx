@@ -14,6 +14,7 @@ import ResetPassword from "./components/auth/ResetPassword";
 import ResetPasswordConfirm from "./components/auth/ResetPasswordConfirm";
 import ProtectedRoute from "./components/ProtectedRoute";
 import GoogleCallback from "./components/auth/GoogleCallback";
+
 const App = () => {
   return (
     <Router>

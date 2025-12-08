@@ -15,6 +15,7 @@ import authRoutes from "./routes/authRoutes.js";
 import mealRoutes from "./routes/mealRoutes.js";
 import workoutRoutes from "./routes/workoutRoutes.js";
 import summaryRoutes from "./routes/summaryRoutes.js";
+import contactRoutes from "./routes/contactRoutes.js";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -46,6 +47,7 @@ app.use("/api/auth", googleAuthRoutes);
 app.use("/api/meals", mealRoutes);
 app.use("/api/workouts", workoutRoutes);
 app.use("/api/summary", summaryRoutes);
+app.use("/api/contact", contactRoutes);
 
 // ---- health check
 app.get("/", (req, res) => res.json({ msg: "API running" }));

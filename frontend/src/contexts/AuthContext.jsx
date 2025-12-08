@@ -6,7 +6,6 @@ const AuthContext = createContext({});
 // eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext);
 
-// FIX: use VITE_API_URL and include /api
 const API_BASE_URL = import.meta.env.VITE_API_URL
   ? `${import.meta.env.VITE_API_URL.replace(/\/$/, "")}/api`
   : "http://localhost:8000/api";
@@ -118,6 +117,16 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const sendContactMessage = async (data) => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/contact`, data);
+      return { success: true, message: response.data.msg };
+    } catch (error) {
+      const message = error.response?.data?.msg || "Failed to send message";
+      return { success: false, error: message };
+    }
+  };
+
   const googleLogin = async (code, redirectUri, mode = "login") => {
     try {
       setError(null);
@@ -147,6 +156,7 @@ export const AuthProvider = ({ children }) => {
     logout,
     resetPassword,
     resetPasswordConfirm,
+    sendContactMessage,
     googleLogin,
     setError,
   };

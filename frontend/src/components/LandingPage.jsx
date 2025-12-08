@@ -979,8 +979,38 @@ const FAQSection = () => {
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, sendContactMessage } = useAuth();
   const [activeNav, setActiveNav] = useState("home");
+  const [formData, setFormData] = useState({ subject: "", message: "" });
+  const [status, setStatus] = useState({ type: "", msg: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (window.location.hash === "#contact") {
+      scrollToSection("contact");
+    }
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setStatus({ type: "", msg: "" });
+
+    const result = await sendContactMessage(formData);
+
+    if (result.success) {
+      setStatus({ type: "success", msg: result.message });
+      setFormData({ subject: "", message: "" });
+    } else {
+      setStatus({ type: "error", msg: result.error });
+    }
+    setIsSubmitting(false);
+  };
 
   const handleGetStarted = () => {
     if (user) {
@@ -1309,40 +1339,62 @@ const LandingPage = () => {
 
           <div className="flex-1 w-full">
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <input
+                    type="text"
+                    placeholder="Full Name *"
+                    className="bg-white/5 border-b border-white/20 px-4 py-3 text-sm focus:border-orange-500 focus:outline-none transition-colors w-full"
+                    defaultValue={user?.name || ""}
+                    readOnly={!!user}
+                  />
+                  <input
+                    type="email"
+                    placeholder="Email *"
+                    className="bg-white/5 border-b border-white/20 px-4 py-3 text-sm focus:border-orange-500 focus:outline-none transition-colors w-full"
+                    defaultValue={user?.email || ""}
+                    readOnly={!!user}
+                  />
+                </div>
                 <input
                   type="text"
-                  placeholder="Full Name *"
-                  className="bg-white/5 border-b border-white/20 px-4 py-3 text-sm focus:border-orange-500 focus:outline-none transition-colors"
+                  placeholder="Your Goal (Subject)"
+                  value={formData.subject}
+                  onChange={(e) =>
+                    setFormData({ ...formData, subject: e.target.value })
+                  }
+                  required
+                  className="w-full bg-white/5 border-b border-white/20 px-4 py-3 text-sm focus:border-orange-500 focus:outline-none transition-colors"
                 />
-                <input
-                  type="email"
-                  placeholder="Email *"
-                  className="bg-white/5 border-b border-white/20 px-4 py-3 text-sm focus:border-orange-500 focus:outline-none transition-colors"
-                />
-              </div>
-              <input
-                type="text"
-                placeholder="Your Goal"
-                className="w-full bg-white/5 border-b border-white/20 px-4 py-3 text-sm focus:border-orange-500 focus:outline-none transition-colors"
-              />
-              <textarea
-                placeholder="Type Your Message..."
-                className="w-full bg-white/5 border-b border-white/20 px-4 py-3 text-sm focus:border-orange-500 focus:outline-none transition-colors h-24 resize-none"
-              ></textarea>
+                <textarea
+                  placeholder="Type Your Message..."
+                  value={formData.message}
+                  onChange={(e) =>
+                    setFormData({ ...formData, message: e.target.value })
+                  }
+                  required
+                  className="w-full bg-white/5 border-b border-white/20 px-4 py-3 text-sm focus:border-orange-500 focus:outline-none transition-colors h-24 resize-none"
+                ></textarea>
 
-              <div className="flex items-center justify-between pt-4">
-                <label className="flex items-center gap-2 text-xs text-gray-500 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    className="rounded border-gray-700 bg-transparent text-orange-500 focus:ring-orange-500"
-                  />
-                  I agree to Privacy Policy
-                </label>
-                <Button onClick={handleGetStarted}>
-                  Send Message <ArrowRight size={14} className="ml-2" />
-                </Button>
-              </div>
+                {status.msg && (
+                  <div
+                    className={`text-sm p-3 rounded ${
+                      status.type === "success"
+                        ? "bg-green-500/20 text-green-400"
+                        : "bg-red-500/20 text-red-400"
+                    }`}
+                  >
+                    {status.msg}
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between pt-4">
+                  <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? "Sending..." : "Send Message"}{" "}
+                    <ArrowRight size={14} className="ml-2" />
+                  </Button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
