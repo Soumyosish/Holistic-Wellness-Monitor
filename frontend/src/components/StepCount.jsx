@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Footprints, RefreshCw, Smartphone, X } from "lucide-react";
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+} from "recharts";
 import axios from "axios";
 import foot from "../assets/foot.png";
 
@@ -53,26 +61,26 @@ const StepCount = () => {
         `${import.meta.env.VITE_API_URL}/api/activity/weekly-stats`,
         { withCredentials: true }
       );
-      
+
       // Create array of last 7 days
       const today = new Date();
       const last7Days = [];
       for (let i = 6; i >= 0; i--) {
         const date = new Date(today);
         date.setDate(today.getDate() - i);
-        const dateStr = date.toISOString().split('T')[0];
-        const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
-        
+        const dateStr = date.toISOString().split("T")[0];
+        const dayName = date.toLocaleDateString("en-US", { weekday: "short" });
+
         // Find data for this date
-        const dayData = response.data.summaries.find(s => s.date === dateStr);
-        
+        const dayData = response.data.summaries.find((s) => s.date === dateStr);
+
         last7Days.push({
           date: dayName,
           steps: dayData?.steps || 0,
-          fullDate: dateStr
+          fullDate: dateStr,
         });
       }
-      
+
       setWeeklyHistory(last7Days);
     } catch (error) {
       console.error("Error fetching weekly step history:", error);
@@ -85,7 +93,7 @@ const StepCount = () => {
         `${import.meta.env.VITE_API_URL}/api/activity/google-fit/status`,
         { withCredentials: true }
       );
-      
+
       if (response.data.connected) {
         setIsConnected(true);
         // Auto-sync steps if connected
@@ -103,9 +111,9 @@ const StepCount = () => {
         {
           accessToken: tokenResponse.access_token,
           refreshToken: tokenResponse.refresh_token,
-          expiryDate: tokenResponse.expires_in 
-            ? Date.now() + tokenResponse.expires_in * 1000 
-            : null
+          expiryDate: tokenResponse.expires_in
+            ? Date.now() + tokenResponse.expires_in * 1000
+            : null,
         },
         { withCredentials: true }
       );
@@ -130,7 +138,12 @@ const StepCount = () => {
 
       const totalSteps = response.data.steps || 0;
       setSteps(totalSteps);
-      setLastSync(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+      setLastSync(
+        new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      );
 
       // Refresh weekly history after sync
       await fetchWeeklyStepHistory();
@@ -193,35 +206,33 @@ const StepCount = () => {
 
   return (
     <div className="bg-white rounded-[2.5rem] p-6 shadow-xl shadow-slate-200/50 border border-slate-100 relative overflow-hidden h-full flex flex-col group transition-all duration-500 hover:shadow-2xl hover:shadow-teal-100/30">
-      
       {/* Decorative Background */}
-      <div className="absolute top-[-50px] right-[-50px] w-40 h-40 bg-teal-100/30 rounded-full blur-[40px]"></div>
+      <div className="absolute top-[-50px] right-[-50px] w-40 h-40 bg-teal-100/30 rounded-full blur-2xl"></div>
 
       {/* Header */}
       <div className="flex justify-between items-start z-10 mb-2">
         <div className="flex items-center gap-2">
-           <div className="p-2.5 bg-white rounded-xl shadow-md border border-slate-100 relative overflow-hidden">
-             <img 
-               src={foot} 
-               alt="Steps" 
-               className="w-7 h-7 object-contain"
-             />
-           </div>
-           <div>
-              <h3 className="font-bold text-slate-800 leading-tight">Activity</h3>
-              <p className="text-[10px] uppercase tracking-wider font-bold text-slate-400 flex items-center gap-1">
-                 {isConnected ? (
-                    <><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Google Fit</>
-                 ) : (
-                    "Local Tracker"
-                 )}
-              </p>
-           </div>
+          <div className="p-2.5 bg-white rounded-xl shadow-md border border-slate-100 relative overflow-hidden">
+            <img src={foot} alt="Steps" className="w-7 h-7 object-contain" />
+          </div>
+          <div>
+            <h3 className="font-bold text-slate-800 leading-tight">Activity</h3>
+            <p className="text-[10px] uppercase tracking-wider font-bold text-slate-400 flex items-center gap-1">
+              {isConnected ? (
+                <>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>{" "}
+                  Google Fit
+                </>
+              ) : (
+                "Local Tracker"
+              )}
+            </p>
+          </div>
         </div>
-        
+
         <div className="flex gap-1">
           {isConnected && (
-            <button 
+            <button
               onClick={handleDisconnect}
               className="p-2 hover:bg-red-50 rounded-full text-slate-400 hover:text-red-600 transition-colors"
               title="Disconnect Google Fit"
@@ -229,13 +240,13 @@ const StepCount = () => {
               <X size={16} />
             </button>
           )}
-          <button 
-             onClick={handleSyncClick}
-             disabled={isSyncing}
-             className="p-2 hover:bg-slate-100 rounded-full text-slate-400 hover:text-teal-600 transition-colors"
-             title={isConnected ? "Sync with Google Fit" : "Connect Google Fit"}
+          <button
+            onClick={handleSyncClick}
+            disabled={isSyncing}
+            className="p-2 hover:bg-slate-100 rounded-full text-slate-400 hover:text-teal-600 transition-colors"
+            title={isConnected ? "Sync with Google Fit" : "Connect Google Fit"}
           >
-             <RefreshCw size={16} className={isSyncing ? "animate-spin" : ""} />
+            <RefreshCw size={16} className={isSyncing ? "animate-spin" : ""} />
           </button>
         </div>
       </div>
@@ -246,44 +257,61 @@ const StepCount = () => {
           <span className="text-4xl sm:text-5xl font-black text-slate-800 tracking-tighter">
             {steps.toLocaleString()}
           </span>
-          <span className="text-sm font-semibold text-slate-400 mb-1">steps</span>
+          <span className="text-sm font-semibold text-slate-400 mb-1">
+            steps
+          </span>
         </div>
         <div className="h-1.5 w-full bg-slate-100 rounded-full mt-2 overflow-hidden">
-           <div 
-             className="h-full bg-gradient-to-r from-teal-400 to-emerald-400 rounded-full transition-all duration-1000 ease-out"
-             style={{ width: `${Math.min((steps/10000)*100, 100)}%` }}
-           ></div>
+          <div
+            className="h-full bg-linear-to-r from-teal-400 to-emerald-400 rounded-full transition-all duration-1000 ease-out"
+            style={{ width: `${Math.min((steps / 10000) * 100, 100)}%` }}
+          ></div>
         </div>
-        <p className="text-xs text-slate-400 mt-1 font-medium">{lastSync ? `Updated ${lastSync}` : 'Goal: 10,000'}</p>
+        <p className="text-xs text-slate-400 mt-1 font-medium">
+          {lastSync ? `Updated ${lastSync}` : "Goal: 10,000"}
+        </p>
       </div>
 
       {/* 7-Day Line Graph */}
       <div className="h-24 -mx-2 mt-4 z-10">
-        <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 px-2">7 Day Trend</div>
+        <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 px-2">
+          7 Day Trend
+        </div>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={weeklyHistory}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" opacity={0.5} />
-            <XAxis 
-              dataKey="date" 
-              tick={{fill: '#94a3b8', fontSize: 10, fontWeight: 600}} 
-              axisLine={false} 
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="#e2e8f0"
+              opacity={0.5}
+            />
+            <XAxis
+              dataKey="date"
+              tick={{ fill: "#94a3b8", fontSize: 10, fontWeight: 600 }}
+              axisLine={false}
               tickLine={false}
               dy={5}
             />
-            <YAxis 
-              tick={{fill: '#94a3b8', fontSize: 10, fontWeight: 600}} 
-              axisLine={false} 
+            <YAxis
+              tick={{ fill: "#94a3b8", fontSize: 10, fontWeight: 600 }}
+              axisLine={false}
               tickLine={false}
               width={35}
             />
-            <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#14b8a6', strokeWidth: 2, strokeDasharray: '5 5' }} />
-            <Line 
-              type="monotone" 
-              dataKey="steps" 
-              stroke="#14b8a6" 
+            <Tooltip
+              content={<CustomTooltip />}
+              cursor={{
+                stroke: "#14b8a6",
+                strokeWidth: 2,
+                strokeDasharray: "5 5",
+              }}
+            />
+            <Line
+              type="monotone"
+              dataKey="steps"
+              stroke="#14b8a6"
               strokeWidth={3}
-              dot={{ fill: '#14b8a6', r: 4 }}
-              activeDot={{ r: 6, fill: '#0d9488' }}
+              dot={{ fill: "#14b8a6", r: 4 }}
+              activeDot={{ r: 6, fill: "#0d9488" }}
             />
           </LineChart>
         </ResponsiveContainer>

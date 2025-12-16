@@ -12,7 +12,7 @@ function MacroChartWidget() {
 
   const fetchTodaysMeals = async () => {
     try {
-      const today = new Date().toISOString().split('T')[0];
+      const today = new Date().toISOString().split("T")[0];
       const response = await axios.get(
         `${import.meta.env.VITE_API_URL}/api/meals?date=${today}`,
         { withCredentials: true }
@@ -34,7 +34,13 @@ function MacroChartWidget() {
     );
   }
 
-  return <MacroChart protein={totals.protein} carbs={totals.carbs} fats={totals.fats} />;
+  return (
+    <MacroChart
+      protein={totals.protein}
+      carbs={totals.carbs}
+      fats={totals.fats}
+    />
+  );
 }
 
 export default MacroChartWidget;

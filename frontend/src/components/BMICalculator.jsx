@@ -313,7 +313,13 @@ const BMICalculator = () => {
           alt="Holistic Wellness Monitor Logo"
           className="h-full w-full object-cover rounded-xl"
         />
-        <BodyPoint top="25%" left="48%" label="Chest (in)" value="44.5" side="left" />
+        <BodyPoint
+          top="25%"
+          left="48%"
+          label="Chest (in)"
+          value="44.5"
+          side="left"
+        />
         <BodyPoint top="45%" left="48%" label="Waist" value="34" side="left" />
       </div>
     </div>

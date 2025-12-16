@@ -1,5 +1,3 @@
-// Health calculation utilities for BMI, BMR, TDEE, and Ideal Weight
-
 /**
  * Calculate Body Mass Index (BMI)
  * @param {number} weight - Weight in kg
@@ -18,10 +16,10 @@ export const calculateBMI = (weight, height) => {
  * @returns {string} BMI category
  */
 export const getBMICategory = (bmi) => {
-  if (bmi < 18.5) return 'Underweight';
-  if (bmi < 25) return 'Normal weight';
-  if (bmi < 30) return 'Overweight';
-  return 'Obese';
+  if (bmi < 18.5) return "Underweight";
+  if (bmi < 25) return "Normal weight";
+  if (bmi < 30) return "Overweight";
+  return "Obese";
 };
 
 /**
@@ -34,26 +32,25 @@ export const getBMICategory = (bmi) => {
  */
 export const calculateBMR = (weight, height, age, gender) => {
   if (!weight || !height || !age || !gender) return 0;
-  
-  // Mifflin-St Jeor Equation
-  // Men: BMR = (10 × weight in kg) + (6.25 × height in cm) - (5 × age in years) + 5
-  // Women: BMR = (10 × weight in kg) + (6.25 × height in cm) - (5 × age in years) - 161
-  
-  const baseBMR = (10 * weight) + (6.25 * height) - (5 * age);
-  const bmr = gender.toLowerCase() === 'male' ? baseBMR + 5 : baseBMR - 161;
-  
+
+  const baseBMR = 10 * weight + 6.25 * height - 5 * age;
+  const bmr = gender.toLowerCase() === "male" ? baseBMR + 5 : baseBMR - 161;
+
   return Math.round(bmr);
 };
 
-/**
- * Activity level multipliers for TDEE calculation
- */
 export const ACTIVITY_LEVELS = {
-  sedentary: { value: 1.2, label: 'Sedentary (little or no exercise)' },
-  light: { value: 1.375, label: 'Lightly active (exercise 1-3 days/week)' },
-  moderate: { value: 1.55, label: 'Moderately active (exercise 3-5 days/week)' },
-  active: { value: 1.725, label: 'Very active (exercise 6-7 days/week)' },
-  extreme: { value: 1.9, label: 'Extremely active (physical job or training twice/day)' }
+  sedentary: { value: 1.2, label: "Sedentary (little or no exercise)" },
+  light: { value: 1.375, label: "Lightly active (exercise 1-3 days/week)" },
+  moderate: {
+    value: 1.55,
+    label: "Moderately active (exercise 3-5 days/week)",
+  },
+  active: { value: 1.725, label: "Very active (exercise 6-7 days/week)" },
+  extreme: {
+    value: 1.9,
+    label: "Extremely active (physical job or training twice/day)",
+  },
 };
 
 /**
@@ -76,53 +73,46 @@ export const calculateTDEE = (bmr, activityLevel) => {
  */
 export const calculateIdealWeight = (height, gender) => {
   if (!height || !gender || height <= 0) return 0;
-  
-  // Devine Formula
-  // Men: 50 kg + 2.3 kg per inch over 5 feet
-  // Women: 45.5 kg + 2.3 kg per inch over 5 feet
-  
+
   const heightInInches = height / 2.54;
   const baseHeight = 60; // 5 feet in inches
-  
+
   if (heightInInches <= baseHeight) {
-    return gender.toLowerCase() === 'male' ? 50 : 45.5;
+    return gender.toLowerCase() === "male" ? 50 : 45.5;
   }
-  
-  const baseWeight = gender.toLowerCase() === 'male' ? 50 : 45.5;
+
+  const baseWeight = gender.toLowerCase() === "male" ? 50 : 45.5;
   const additionalWeight = 2.3 * (heightInInches - baseHeight);
-  
+
   return parseFloat((baseWeight + additionalWeight).toFixed(1));
 };
 
-/**
- * Goal types and their calorie adjustments
- */
 export const GOAL_TYPES = {
-  weight_loss: { 
-    value: -500, 
-    label: 'Weight Loss',
-    description: 'Lose 0.5 kg per week'
+  weight_loss: {
+    value: -500,
+    label: "Weight Loss",
+    description: "Lose 0.5 kg per week",
   },
-  weight_loss_aggressive: { 
-    value: -750, 
-    label: 'Aggressive Weight Loss',
-    description: 'Lose 0.75 kg per week'
+  weight_loss_aggressive: {
+    value: -750,
+    label: "Aggressive Weight Loss",
+    description: "Lose 0.75 kg per week",
   },
-  maintenance: { 
-    value: 0, 
-    label: 'Maintain Weight',
-    description: 'Maintain current weight'
+  maintenance: {
+    value: 0,
+    label: "Maintain Weight",
+    description: "Maintain current weight",
   },
-  weight_gain: { 
-    value: 300, 
-    label: 'Weight Gain',
-    description: 'Gain 0.25 kg per week'
+  weight_gain: {
+    value: 300,
+    label: "Weight Gain",
+    description: "Gain 0.25 kg per week",
   },
-  muscle_building: { 
-    value: 500, 
-    label: 'Muscle Building',
-    description: 'Gain 0.5 kg per week with strength training'
-  }
+  muscle_building: {
+    value: 500,
+    label: "Muscle Building",
+    description: "Gain 0.5 kg per week with strength training",
+  },
 };
 
 /**
@@ -135,7 +125,7 @@ export const calculateDailyCalorieTarget = (tdee, goal) => {
   if (!tdee || !goal) return 0;
   const adjustment = GOAL_TYPES[goal]?.value || 0;
   const target = tdee + adjustment;
-  
+
   // Ensure minimum calorie intake (1200 for women, 1500 for men as general guideline)
   return Math.max(target, 1200);
 };
@@ -148,32 +138,32 @@ export const calculateDailyCalorieTarget = (tdee, goal) => {
  */
 export const calculateMacroTargets = (dailyCalories, goal) => {
   if (!dailyCalories) return { protein: 0, carbs: 0, fats: 0 };
-  
+
   let proteinPercent, carbsPercent, fatsPercent;
-  
+
   // Adjust macro ratios based on goal
-  if (goal === 'muscle_building') {
+  if (goal === "muscle_building") {
     // Higher protein for muscle building
-    proteinPercent = 0.30;
+    proteinPercent = 0.3;
     carbsPercent = 0.45;
     fatsPercent = 0.25;
-  } else if (goal === 'weight_loss' || goal === 'weight_loss_aggressive') {
+  } else if (goal === "weight_loss" || goal === "weight_loss_aggressive") {
     // Higher protein to preserve muscle during weight loss
     proteinPercent = 0.35;
     carbsPercent = 0.35;
-    fatsPercent = 0.30;
+    fatsPercent = 0.3;
   } else {
     // Balanced for maintenance
     proteinPercent = 0.25;
     carbsPercent = 0.45;
-    fatsPercent = 0.30;
+    fatsPercent = 0.3;
   }
-  
+
   // Calculate grams (protein: 4 cal/g, carbs: 4 cal/g, fats: 9 cal/g)
   const protein = Math.round((dailyCalories * proteinPercent) / 4);
   const carbs = Math.round((dailyCalories * carbsPercent) / 4);
   const fats = Math.round((dailyCalories * fatsPercent) / 9);
-  
+
   return { protein, carbs, fats };
 };
 
@@ -185,19 +175,19 @@ export const calculateMacroTargets = (dailyCalories, goal) => {
  */
 export const calculateWaterGoal = (weight, activityLevel) => {
   if (!weight) return 2000; // Default 2L
-  
+
   // Base: 30-35ml per kg of body weight
   let baseWater = weight * 33;
-  
+
   // Add extra for activity level
   const activityBonus = {
     sedentary: 0,
     light: 250,
     moderate: 500,
     active: 750,
-    extreme: 1000
+    extreme: 1000,
   };
-  
+
   const bonus = activityBonus[activityLevel] || 0;
   return Math.round(baseWater + bonus);
 };
@@ -213,8 +203,8 @@ export const calculateStepGoal = (activityLevel) => {
     light: 7500,
     moderate: 10000,
     active: 12500,
-    extreme: 15000
+    extreme: 15000,
   };
-  
+
   return stepGoals[activityLevel] || 10000;
 };

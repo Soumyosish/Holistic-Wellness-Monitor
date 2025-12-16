@@ -5,7 +5,6 @@ import { protect } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
-// REGISTER validation
 router.post(
   "/register",
   [
@@ -20,7 +19,6 @@ router.post(
   register
 );
 
-// LOGIN validation
 router.post(
   "/login",
   [

@@ -17,12 +17,11 @@ import "../index.css";
 function DashBoard() {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const { user, logout } = useAuth();
-  
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-100 via-indigo-100 to-violet-100">
+    <div className="min-h-screen bg-linear-to-br from-sky-100 via-indigo-100 to-violet-100">
       <Navbar user={user} logout={logout} />
       <main className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
-        
         {/* Row 1: BMI (Left) & Health Overview (Right) */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-6 mb-6">
           <BMICalculator />
@@ -47,7 +46,6 @@ function DashBoard() {
       </main>
     </div>
   );
-
 }
 
 export default DashBoard;
