@@ -172,18 +172,18 @@ function SleepTracker() {
           
           <div className="flex-1 w-full bg-white/50 rounded-2xl border border-white p-2 shadow-sm">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={weeklyData} onMouseMove={(state) => setActiveBar(state.activeTooltipIndex)} onMouseLeave={() => setActiveBar(null)}>
+              <BarChart data={weeklyData} onMouseMove={(state) => setActiveBar(state.activeTooltipIndex)} onMouseLeave={() => setActiveBar(null)} barCategoryGap="2%">
                 <Tooltip cursor={{fill: 'transparent'}} content={<CustomTooltip />} />
                 <XAxis 
                   dataKey="date" 
                   tick={{fill: '#94a3b8', fontSize: 10, fontWeight: 600}} 
                   axisLine={false} 
                   tickLine={false} 
-                  padding={{left: 10, right: 10}}
+                  padding={{left: 0, right: 0}}
                   dy={10}
                 />
                 <ReferenceLine y={8} stroke="#10b981" strokeDasharray="3 3" opacity={0.3} />
-                <Bar dataKey="hours" radius={[8, 8, 8, 8]} barSize={24}>
+                <Bar dataKey="hours" radius={[6, 6, 6, 6]}>
                   {weeklyData.map((entry, index) => (
                     <Cell 
                       key={`cell-${index}`} 
