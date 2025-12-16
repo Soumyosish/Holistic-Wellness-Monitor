@@ -93,7 +93,10 @@ export const forgotPassword = async (req, res) => {
     const token = crypto.randomBytes(32).toString("hex");
     user.resetPasswordToken = token;
     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+    
+    console.log(`Generating reset token for user: ${user.email} (ID: ${user._id})`);
     await user.save();
+    console.log("User saved with new reset token.");
 
     // Use env variable or default
     const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
@@ -109,14 +112,14 @@ export const forgotPassword = async (req, res) => {
 
     // --- EMAIL SENDING LOGIC ---
     try {
-      await sendEmail({
+      const emailResult = await sendEmail({
         to: user.email,
         subject: "Password Reset",
         html: message,
       });
 
-      // Check if simulated by checking env (simplified for response)
-      const isSimulated = !process.env.EMAIL_USER || !process.env.EMAIL_PASS;
+      // Check if simulated by checking the result from emailService
+      const isSimulated = emailResult.isSimulated;
 
       res.status(200).json({
         success: true,

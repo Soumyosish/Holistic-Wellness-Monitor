@@ -170,12 +170,13 @@ function SleepTracker() {
           <div className="relative w-24 group/input">
             <input
               type="number"
+              min="0"
               step="0.5"
               defaultValue={sleepData.sleepHours}
               className="w-full bg-white text-slate-700 border border-slate-200 rounded-2xl px-4 py-3 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 text-center font-bold font-mono shadow-sm transition-all"
               onBlur={(e) =>
                 updateSleep(
-                  parseFloat(e.target.value) || 0,
+                  Math.max(0, parseFloat(e.target.value) || 0),
                   sleepData.sleepQuality || 3
                 )
               }

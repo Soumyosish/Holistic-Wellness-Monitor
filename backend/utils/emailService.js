@@ -16,7 +16,7 @@ export const sendEmail = async ({ to, subject, html }) => {
     // Check credentials first
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
       logSimulation();
-      return { success: true, message: "Email sent (Simulated)" };
+      return { success: true, message: "Email sent (Simulated)", isSimulated: true };
     }
 
     const transporter = nodemailer.createTransport({
@@ -43,15 +43,16 @@ export const sendEmail = async ({ to, subject, html }) => {
     });
 
     console.log(`Email sent to: ${to}`);
-    return { success: true, message: "Email sent successfully" };
+    return { success: true, message: "Email sent successfully", isSimulated: false };
   } catch (err) {
     // If it's a network/socket error (Antivirus blocking or Firewall), fall back to simulation
-    console.error(
-      "Email service error (Falling back to simulation):",
-      err.message
+    // If it's a network/socket error (Antivirus blocking or Firewall), fall back to simulation
+    console.warn(
+      `[INFO] Email send blocked by local network/antivirus (${err.code}). switching to SIMULATION mode.`
     );
+    console.log("ACTION REQUIRED: Use the link below to reset the password:");
     logSimulation();
     // Return success so the frontend doesn't show an error
-    return { success: true, message: "Email sent (Simulated Fallback)" };
+    return { success: true, message: "Email sent (Simulated Fallback)", isSimulated: true };
   }
 };

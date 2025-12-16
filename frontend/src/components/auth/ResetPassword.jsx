@@ -47,15 +47,16 @@ const ResetPassword = () => {
           <div className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg">
             {message}
             {resetUrl && (
-              <div className="mt-2 text-sm font-semibold">
-                <p>Dev Mode (Email not configured):</p>
+              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-xs font-bold uppercase tracking-wider text-blue-700 mb-1">Development / Antivirus Fallback</p>
+                <p className="text-sm text-blue-800 mb-2">
+                  Since actual email sending was blocked (likely by antivirus), here is the link:
+                </p>
                 <a
                   href={resetUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline text-blue-600 break-all"
+                  className="block w-full text-center bg-blue-600 text-white font-semibold py-2 rounded-md hover:bg-blue-700 transition"
                 >
-                  Click here to reset password
+                  Reset Password Now
                 </a>
               </div>
             )}

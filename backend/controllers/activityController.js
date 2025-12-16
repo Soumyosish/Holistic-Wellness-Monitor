@@ -101,9 +101,11 @@ export const updateSteps = async (req, res) => {
     const { steps, date } = req.body;
     const targetDate = date || getTodayDateIST();
 
+    const validatedSteps = Math.max(0, steps); // Ensure steps are not negative
+
     const summary = await DailySummary.findOneAndUpdate(
       { user: userId, date: targetDate },
-      { steps },
+      { steps: validatedSteps },
       { new: true, upsert: true, setDefaultsOnInsert: true }
     );
 
@@ -121,8 +123,8 @@ export const updateSleep = async (req, res) => {
     const targetDate = date || getTodayDateIST();
 
     const updateData = {};
-    if (sleepHours !== undefined) updateData.sleepHours = sleepHours;
-    if (sleepQuality !== undefined) updateData.sleepQuality = sleepQuality;
+    if (sleepHours !== undefined) updateData.sleepHours = Math.max(0, sleepHours); // Prevent negative hours
+    if (sleepQuality !== undefined) updateData.sleepQuality = Math.max(0, sleepQuality);
     if (sleepStart) updateData.sleepStart = new Date(sleepStart);
     if (sleepEnd) updateData.sleepEnd = new Date(sleepEnd);
 
@@ -145,9 +147,11 @@ export const updateWeight = async (req, res) => {
     const { weight, date } = req.body;
     const targetDate = date || new Date().toISOString().split("T")[0];
 
+    const validatedWeight = Math.max(0, weight);
+
     const summary = await DailySummary.findOneAndUpdate(
       { user: userId, date: targetDate },
-      { weight },
+      { weight: validatedWeight },
       { new: true, upsert: true, setDefaultsOnInsert: true }
     );
 
@@ -406,7 +410,6 @@ export const syncGoogleFitSteps = async (req, res) => {
     // Calculate IST-aligned timestamps using pure UTC math
     // Goal: Align buckets to IST Midnight (18:30 UTC of previous day)
     
-    const now = new Date();
     // Get current UTC timestamp
     const nowUTC = now.getTime();
     
@@ -430,8 +433,8 @@ export const syncGoogleFitSteps = async (req, res) => {
     
     // We want 7 days history relative to TODAY
     // Start Time = Today Start - 6 days
-    const startTimeMillis = todayStartEpoch - (6 * millisPerDay);
-    const endTimeMillis = todayEndEpoch; // Includes all of today
+    // const startTimeMillis = todayStartEpoch - (6 * millisPerDay);  <-- REMOVED DUPLICATE
+    // const endTimeMillis = todayEndEpoch; // Includes all of today    <-- REMOVED DUPLICATE
 
     // Fetch step data from Google Fit for last 7 days
     const response = await fitness.users.dataset.aggregate({
@@ -455,7 +458,7 @@ export const syncGoogleFitSteps = async (req, res) => {
     let todaySteps = 0;
     
     // Convert today's IST start to string YYYY-MM-DD for comparison
-    const todayDateObj = new Date(todayStartIST); // Treating logic-time as UTC for formatting purposes works if we stick to UTC methods
+    const todayDateObjForSteps = new Date(todayStartIST); // Renamed to avoid conflict
     const todayISO = new Date(nowUTC + IST_OFFSET).toISOString().split('T')[0];
 
     // Process each daily bucket
@@ -478,10 +481,10 @@ export const syncGoogleFitSteps = async (req, res) => {
         // standard Date methods on this will give UTC breakdown which matches IST date elements
         // e.g. 00:00 IST (representation) -> Date(00:00).getUTCHours() === 0
         const dateObj = new Date(bucketStartIST);
-        const year = dateObj.getUTCFullYear();
-        const month = String(dateObj.getUTCMonth() + 1).padStart(2, '0');
-        const day = String(dateObj.getUTCDate()).padStart(2, '0');
-        const bucketDate = `${year}-${month}-${day}`;
+        const yearVal = dateObj.getUTCFullYear(); // Renamed to avoid conflict with upper scope year
+        const monthVal = String(dateObj.getUTCMonth() + 1).padStart(2, '0');
+        const dayVal = String(dateObj.getUTCDate()).padStart(2, '0');
+        const bucketDate = `${yearVal}-${monthVal}-${dayVal}`;
 
         const datasets = bucket.dataset || [];
         datasets.forEach((ds) => {
@@ -506,11 +509,8 @@ export const syncGoogleFitSteps = async (req, res) => {
     }
 
     // Get the updated summary for today
-    const summary = await DailySummary.findOne({
-      user: userId,
-      date: todayIST,
-    });
-    const summary = await DailySummary.findOne({ user: userId, date: todayISO });
+    // Removed duplicate declaration and query here, sticking to one consistent query
+    const summary = await DailySummary.findOne({ user: userId, date: todayISO }); 
 
     res.json({
       steps: todaySteps,
