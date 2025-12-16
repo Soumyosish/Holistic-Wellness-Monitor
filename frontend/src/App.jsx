@@ -14,6 +14,10 @@ import ResetPassword from "./components/auth/ResetPassword";
 import ResetPasswordConfirm from "./components/auth/ResetPasswordConfirm";
 import ProtectedRoute from "./components/ProtectedRoute";
 import GoogleCallback from "./components/auth/GoogleCallback";
+import UserProfile from "./components/UserProfile";
+import MealTracker from "./components/MealTracker";
+import WorkoutTracker from "./components/WorkoutTracker";
+import ProgressGraphs from "./components/ProgressGraphs";
 
 const App = () => {
   return (
@@ -33,6 +37,38 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <UserProfile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/meals"
+            element={
+              <ProtectedRoute>
+                <MealTracker />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/workouts"
+            element={
+              <ProtectedRoute>
+                <WorkoutTracker />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/progress"
+            element={
+              <ProtectedRoute>
+                <ProgressGraphs />
               </ProtectedRoute>
             }
           />
