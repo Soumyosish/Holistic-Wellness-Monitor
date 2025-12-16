@@ -256,7 +256,7 @@ export default function UserProfile() {
                           name="age"
                           value={formData.age}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none"
+                          className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none"
                           required
                         />
                       </div>
@@ -266,7 +266,7 @@ export default function UserProfile() {
                           name="gender"
                           value={formData.gender}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none bg-white"
+                          className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none"
                           required
                         >
                           <option value="">Select Gender</option>
@@ -282,7 +282,7 @@ export default function UserProfile() {
                           name="height"
                           value={formData.height}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none"
+                          className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none"
                           required
                         />
                       </div>
@@ -293,7 +293,7 @@ export default function UserProfile() {
                           name="weight"
                           value={formData.weight}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none"
+                          className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none"
                           required
                         />
                       </div>
@@ -366,13 +366,13 @@ export default function UserProfile() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
                            <label className="text-sm font-semibold text-slate-700">Diet Type</label>
-                           <select name="dietType" value={formData.dietType} onChange={handleInputChange} className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none bg-white">
+                           <select name="dietType" value={formData.dietType} onChange={handleInputChange} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none">
                               {Object.entries(DIET_TYPES).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
                            </select>
                         </div>
                          <div className="space-y-2">
                            <label className="text-sm font-semibold text-slate-700">Budget</label>
-                           <select name="budget" value={formData.budget} onChange={handleInputChange} className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none bg-white">
+                           <select name="budget" value={formData.budget} onChange={handleInputChange} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none">
                               {Object.entries(BUDGETS).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
                            </select>
                         </div>
@@ -382,7 +382,7 @@ export default function UserProfile() {
                       <div className="space-y-2">
                           <label className="text-sm font-semibold text-slate-700">Allergies</label>
                           <div className="flex gap-2">
-                             <input type="text" value={allergyInput} onChange={(e) => setAllergyInput(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addAllergy())} className="flex-1 px-4 py-2 rounded-xl border border-slate-200 outline-none" placeholder="Add allergy..." />
+                             <input type="text" value={allergyInput} onChange={(e) => setAllergyInput(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addAllergy())} className="flex-1 px-4 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 font-medium outline-none" placeholder="Add allergy..." />
                              <button type="button" onClick={addAllergy} className="px-4 py-2 bg-slate-100 rounded-xl hover:bg-slate-200">+</button>
                           </div>
                           <div className="flex flex-wrap gap-2 mt-2">
@@ -396,7 +396,7 @@ export default function UserProfile() {
                       <div className="space-y-2">
                           <label className="text-sm font-semibold text-slate-700">Dislikes</label>
                           <div className="flex gap-2">
-                             <input type="text" value={dislikedFoodInput} onChange={(e) => setDislikedFoodInput(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addDislikedFood())} className="flex-1 px-4 py-2 rounded-xl border border-slate-200 outline-none" placeholder="Add dislike..." />
+                             <input type="text" value={dislikedFoodInput} onChange={(e) => setDislikedFoodInput(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addDislikedFood())} className="flex-1 px-4 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 font-medium outline-none" placeholder="Add dislike..." />
                              <button type="button" onClick={addDislikedFood} className="px-4 py-2 bg-slate-100 rounded-xl hover:bg-slate-200">+</button>
                           </div>
                           <div className="flex flex-wrap gap-2 mt-2">
