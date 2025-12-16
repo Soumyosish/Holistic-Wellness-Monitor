@@ -57,16 +57,29 @@ function TodaysMeals() {
   // Calculate "Other" calories (e.g. from alcohol or missing macro data)
   const otherCalories = Math.max(0, totals.calories - macroCalories);
 
-  // Create data with "Remaining" slice to simulate a progress bar filling up
-  const chartData = [
+  // Create chart data showing only consumed calories (no "Remaining" slice)
+  // The pie will naturally show progress as it fills up toward the goal
+  const consumedData = [
     { name: "Protein", value: totals.protein * 4, color: COLORS.protein }, 
     { name: "Carbs", value: totals.carbs * 4, color: COLORS.carbs },       
-    { name: "Fats", value: totals.fats * 9, color: COLORS.fats },
-    { name: "Other", value: otherCalories, color: "#94a3b8" }, // Slate 400 for unspecified
-    { name: "Remaining", value: remaining, color: "#f1f5f9" }             
+    { name: "Fats", value: totals.fats * 9, color: COLORS.fats }
   ];
 
-  // Note: We use calories for the chart values to be proportional to total energy
+  // Filter out zero values for cleaner display
+  const chartData = consumedData.filter(item => item.value > 0);
+  
+  // If no data, show a minimal placeholder
+  if (chartData.length === 0) {
+    chartData.push({ name: "Empty", value: 1, color: "#f1f5f9" });
+  }
+
+  // Add "Other" calories if present
+  if (otherCalories > 0) {
+    chartData.push({ name: "Other", value: otherCalories, color: "#94a3b8" });
+  }
+
+  // Calculate percentage of goal achieved
+  const percentComplete = Math.min(100, Math.round((totals.calories / calorieGoal) * 100));
 
 
   return (
@@ -110,12 +123,12 @@ function TodaysMeals() {
                         data={chartData}
                         innerRadius={60}
                         outerRadius={75}
-                        paddingAngle={2}
+                        paddingAngle={totals.calories > 0 ? 2 : 0}
                         dataKey="value"
-                        cornerRadius={10}
+                        cornerRadius={8}
                         stroke="none"
                         startAngle={90}
-                        endAngle={-270}
+                        endAngle={90 - (360 * Math.min(totals.calories / calorieGoal, 1))}
                      >
                         {chartData.map((entry, index) => (
                            <Cell key={`cell-${index}`} fill={entry.color} />
@@ -127,6 +140,11 @@ function TodaysMeals() {
                      />
                   </PieChart>
                </ResponsiveContainer>
+               
+               {/* Background ring to show total goal */}
+               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                 <div className="w-[150px] h-[150px] rounded-full border-[15px] border-slate-100/60"></div>
+               </div>
                
                {/* Center Text */}
                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
