@@ -306,6 +306,56 @@ export default function UserProfile() {
                         <option value="female">Female</option>
                         <option value="other">Other</option>
                       </select>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-slate-700">Age</label>
+                        <input
+                          type="number"
+                          name="age"
+                          value={formData.age}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-slate-700">Gender</label>
+                        <select
+                          name="gender"
+                          value={formData.gender}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none"
+                          required
+                        >
+                          <option value="">Select Gender</option>
+                          <option value="male">Male</option>
+                          <option value="female">Female</option>
+                          <option value="other">Other</option>
+                        </select>
+                      </div>
+                      <div className="space-y-2">
+                         <label className="text-sm font-semibold text-slate-700">Height (cm)</label>
+                         <input
+                          type="number"
+                          name="height"
+                          value={formData.height}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none"
+                          required
+                        />
+                      </div>
+                       <div className="space-y-2">
+                         <label className="text-sm font-semibold text-slate-700">Weight (kg)</label>
+                         <input
+                          type="number"
+                          name="weight"
+                          value={formData.weight}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none"
+                          required
+                        />
+                      </div>
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-semibold text-slate-700">
@@ -483,6 +533,19 @@ export default function UserProfile() {
                           </option>
                         ))}
                       </select>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                           <label className="text-sm font-semibold text-slate-700">Diet Type</label>
+                           <select name="dietType" value={formData.dietType} onChange={handleInputChange} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none">
+                              {Object.entries(DIET_TYPES).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+                           </select>
+                        </div>
+                         <div className="space-y-2">
+                           <label className="text-sm font-semibold text-slate-700">Budget</label>
+                           <select name="budget" value={formData.budget} onChange={handleInputChange} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 font-medium focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none">
+                              {Object.entries(BUDGETS).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+                           </select>
+                        </div>
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-semibold text-slate-700">
@@ -544,6 +607,34 @@ export default function UserProfile() {
                             </button>
                           </span>
                         ))}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                      <div className="space-y-2">
+                          <label className="text-sm font-semibold text-slate-700">Allergies</label>
+                          <div className="flex gap-2">
+                             <input type="text" value={allergyInput} onChange={(e) => setAllergyInput(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addAllergy())} className="flex-1 px-4 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 font-medium outline-none" placeholder="Add allergy..." />
+                             <button type="button" onClick={addAllergy} className="px-4 py-2 bg-slate-100 rounded-xl hover:bg-slate-200">+</button>
+                          </div>
+                          <div className="flex flex-wrap gap-2 mt-2">
+                             {formData.allergies.map((a, i) => (
+                                <span key={i} className="px-3 py-1 bg-red-50 text-red-600 rounded-full text-sm font-medium flex items-center gap-1">
+                                   {a} <button type="button" onClick={() => removeAllergy(a)} className="hover:text-red-800">×</button>
+                                </span>
+                             ))}
+                          </div>
+                      </div>
+                      <div className="space-y-2">
+                          <label className="text-sm font-semibold text-slate-700">Dislikes</label>
+                          <div className="flex gap-2">
+                             <input type="text" value={dislikedFoodInput} onChange={(e) => setDislikedFoodInput(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addDislikedFood())} className="flex-1 px-4 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 font-medium outline-none" placeholder="Add dislike..." />
+                             <button type="button" onClick={addDislikedFood} className="px-4 py-2 bg-slate-100 rounded-xl hover:bg-slate-200">+</button>
+                          </div>
+                          <div className="flex flex-wrap gap-2 mt-2">
+                             {formData.dislikedFoods.map((f, i) => (
+                                <span key={i} className="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-sm font-medium flex items-center gap-1">
+                                   {f} <button type="button" onClick={() => removeDislikedFood(f)} className="hover:text-slate-800">×</button>
+                                </span>
+                             ))}
+                          </div>
                       </div>
                     </div>
                     <div className="space-y-2">

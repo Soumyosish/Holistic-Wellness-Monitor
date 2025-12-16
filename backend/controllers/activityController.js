@@ -403,6 +403,35 @@ export const syncGoogleFitSteps = async (req, res) => {
     const startParts = getISTDateParts(sevenDaysAgoObj);
     const startDateString = `${startParts.year}-${startParts.month}-${startParts.day}T00:00:00.000+05:30`;
     const startTimeMillis = new Date(startDateString).getTime();
+    // Calculate IST-aligned timestamps using pure UTC math
+    // Goal: Align buckets to IST Midnight (18:30 UTC of previous day)
+    
+    const now = new Date();
+    // Get current UTC timestamp
+    const nowUTC = now.getTime();
+    
+    // IST Offset in millis
+    const IST_OFFSET = 5.5 * 60 * 60 * 1000;
+    
+    // Calculate "Current IST Time" in millis (conceptually)
+    const nowIST = nowUTC + IST_OFFSET;
+    
+    // Find the end of today in IST (next midnight)
+    // Floor to day boundary
+    const millisPerDay = 24 * 60 * 60 * 1000;
+    const todayStartIST = Math.floor(nowIST / millisPerDay) * millisPerDay;
+    const todayEndIST = todayStartIST + millisPerDay;
+    
+    // Convert back to UTC epoch
+    // IST Midnight = UTC 18:30 (prev day). 
+    // If todayStartIST is aligned to 00:00, subtracting offset gives UTC epoch
+    const todayStartEpoch = todayStartIST - IST_OFFSET;
+    const todayEndEpoch = todayEndIST - IST_OFFSET; // End of today (23:59:59.999 approx)
+    
+    // We want 7 days history relative to TODAY
+    // Start Time = Today Start - 6 days
+    const startTimeMillis = todayStartEpoch - (6 * millisPerDay);
+    const endTimeMillis = todayEndEpoch; // Includes all of today
 
     // Fetch step data from Google Fit for last 7 days
     const response = await fitness.users.dataset.aggregate({
@@ -414,13 +443,20 @@ export const syncGoogleFitSteps = async (req, res) => {
           },
         ],
         bucketByTime: { durationMillis: 24 * 60 * 60 * 1000 },
+        aggregateBy: [{
+          dataTypeName: 'com.google.step_count.delta',
+        }],
+        bucketByTime: { durationMillis: millisPerDay },
         startTimeMillis,
         endTimeMillis,
       },
     });
 
     let todaySteps = 0;
-    const istOffset = 19800000; // 5.5 * 60 * 60 * 1000
+    
+    // Convert today's IST start to string YYYY-MM-DD for comparison
+    const todayDateObj = new Date(todayStartIST); // Treating logic-time as UTC for formatting purposes works if we stick to UTC methods
+    const todayISO = new Date(nowUTC + IST_OFFSET).toISOString().split('T')[0];
 
     // Process each daily bucket
     if (response.data.bucket) {
@@ -432,6 +468,19 @@ export const syncGoogleFitSteps = async (req, res) => {
         // Center of the bucket check to avoid edge cases
         const midBucketTime = bucketStartTime + 12 * 60 * 60 * 1000;
         const { year, month, day } = getISTDateParts(new Date(midBucketTime));
+        
+        // Calculate the central date of this bucket in IST coordinates
+        // Bucket Start (UTC) + Offset = Bucket Start (IST)
+        // This should be 00:00:00 IST
+        const bucketStartIST = bucketStartTime + IST_OFFSET;
+        
+        // create Date object from this "IST timestamp"
+        // standard Date methods on this will give UTC breakdown which matches IST date elements
+        // e.g. 00:00 IST (representation) -> Date(00:00).getUTCHours() === 0
+        const dateObj = new Date(bucketStartIST);
+        const year = dateObj.getUTCFullYear();
+        const month = String(dateObj.getUTCMonth() + 1).padStart(2, '0');
+        const day = String(dateObj.getUTCDate()).padStart(2, '0');
         const bucketDate = `${year}-${month}-${day}`;
 
         const datasets = bucket.dataset || [];
@@ -450,7 +499,7 @@ export const syncGoogleFitSteps = async (req, res) => {
           { new: true, upsert: true, setDefaultsOnInsert: true }
         );
 
-        if (bucketDate === todayIST) {
+        if (bucketDate === todayISO) {
           todaySteps = dailySteps;
         }
       }
@@ -461,6 +510,7 @@ export const syncGoogleFitSteps = async (req, res) => {
       user: userId,
       date: todayIST,
     });
+    const summary = await DailySummary.findOne({ user: userId, date: todayISO });
 
     res.json({
       steps: todaySteps,
