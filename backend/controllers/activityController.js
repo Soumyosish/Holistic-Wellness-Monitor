@@ -1,5 +1,17 @@
 import DailySummary from "../models/DailySummary.js";
 import User from "../models/User.js";
+import { google } from "googleapis";
+
+/**
+ * Helper function to get current date in IST timezone (YYYY-MM-DD)
+ */
+const getTodayDateIST = () => {
+  const now = new Date();
+  // Convert to IST (UTC+5:30)
+  const istOffset = 5.5 * 60 * 60 * 1000; // 5.5 hours in milliseconds
+  const istDate = new Date(now.getTime() + istOffset);
+  return istDate.toISOString().split('T')[0];
+};
 
 /**
  * Get today's summary or create if doesn't exist
@@ -7,7 +19,8 @@ import User from "../models/User.js";
 export const getTodaySummary = async (req, res) => {
   try {
     const userId = req.user._id;
-    const today = new Date().toISOString().split('T')[0];
+    // Use IST date instead of UTC
+    const today = getTodayDateIST();
 
     let summary = await DailySummary.findOne({ user: userId, date: today });
 
@@ -59,13 +72,30 @@ export const updateWaterIntake = async (req, res) => {
   try {
     const userId = req.user._id;
     const { amount, date } = req.body;
-    const targetDate = date || new Date().toISOString().split('T')[0];
+    const targetDate = date || getTodayDateIST();
 
-    const summary = await DailySummary.findOneAndUpdate(
-      { user: userId, date: targetDate },
-      { $inc: { waterIntake: amount } },
-      { new: true, upsert: true, setDefaultsOnInsert: true }
-    );
+    // First, get the current summary to check current water intake
+    let summary = await DailySummary.findOne({ user: userId, date: targetDate });
+    
+    if (!summary) {
+      // Create new summary if doesn't exist
+      const user = await User.findById(userId);
+      summary = await DailySummary.create({
+        user: userId,
+        date: targetDate,
+        waterGoal: user?.dailyWaterGoal || 2000,
+        stepGoal: user?.dailyStepGoal || 10000,
+        calorieGoal: user?.dailyCalorieTarget || 2000
+      });
+    }
+
+    // Calculate new water intake and ensure it doesn't go below 0
+    const currentWater = summary.waterIntake || 0;
+    const newWaterIntake = Math.max(0, currentWater + amount);
+    
+    // Update with the validated value
+    summary.waterIntake = newWaterIntake;
+    await summary.save();
 
     res.json(summary);
   } catch (error) {
@@ -81,7 +111,7 @@ export const updateSteps = async (req, res) => {
   try {
     const userId = req.user._id;
     const { steps, date } = req.body;
-    const targetDate = date || new Date().toISOString().split('T')[0];
+    const targetDate = date || getTodayDateIST();
 
     const summary = await DailySummary.findOneAndUpdate(
       { user: userId, date: targetDate },
@@ -103,7 +133,7 @@ export const updateSleep = async (req, res) => {
   try {
     const userId = req.user._id;
     const { sleepHours, sleepQuality, sleepStart, sleepEnd, date } = req.body;
-    const targetDate = date || new Date().toISOString().split('T')[0];
+    const targetDate = date || getTodayDateIST();
 
     const updateData = {};
     if (sleepHours !== undefined) updateData.sleepHours = sleepHours;
@@ -175,57 +205,298 @@ export const getActivityHistory = async (req, res) => {
 };
 
 /**
- * Get weekly stats
+ * Get weekly statistics (last 7 days)
  */
 export const getWeeklyStats = async (req, res) => {
   try {
     const userId = req.user._id;
     
-    // Get last 7 days
-    const endDate = new Date();
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - 6);
+    // Get today's date in IST
+    const todayIST = getTodayDateIST();
+    const today = new Date(todayIST);
+    
+    // Calculate 7 days ago in IST
+    const sevenDaysAgo = new Date(today);
+    sevenDaysAgo.setDate(today.getDate() - 6); // Include today, so -6 days
+    const sevenDaysAgoStr = sevenDaysAgo.toISOString().split('T')[0];
 
+    // Fetch summaries for the last 7 days
     const summaries = await DailySummary.find({
       user: userId,
-      date: {
-        $gte: startDate.toISOString().split('T')[0],
-        $lte: endDate.toISOString().split('T')[0]
-      }
+      date: { $gte: sevenDaysAgoStr, $lte: todayIST }
     }).sort({ date: 1 });
 
     // Calculate averages
-    const stats = {
-      avgWaterIntake: 0,
-      avgSteps: 0,
-      avgSleepHours: 0,
-      avgCaloriesConsumed: 0,
-      avgCaloriesBurned: 0,
-      totalDays: summaries.length,
-      summaries
-    };
+    const avgWaterIntake = summaries.length > 0
+      ? summaries.reduce((sum, s) => sum + (s.waterIntake || 0), 0) / summaries.length
+      : 0;
+    
+    const avgSleepHours = summaries.length > 0
+      ? summaries.reduce((sum, s) => sum + (s.sleepHours || 0), 0) / summaries.length
+      : 0;
+    
+    const avgSteps = summaries.length > 0
+      ? summaries.reduce((sum, s) => sum + (s.steps || 0), 0) / summaries.length
+      : 0;
 
-    if (summaries.length > 0) {
-      stats.avgWaterIntake = Math.round(
-        summaries.reduce((sum, s) => sum + (s.waterIntake || 0), 0) / summaries.length
-      );
-      stats.avgSteps = Math.round(
-        summaries.reduce((sum, s) => sum + (s.steps || 0), 0) / summaries.length
-      );
-      stats.avgSleepHours = (
-        summaries.reduce((sum, s) => sum + (s.sleepHours || 0), 0) / summaries.length
-      ).toFixed(1);
-      stats.avgCaloriesConsumed = Math.round(
-        summaries.reduce((sum, s) => sum + (s.caloriesConsumed || 0), 0) / summaries.length
-      );
-      stats.avgCaloriesBurned = Math.round(
-        summaries.reduce((sum, s) => sum + (s.caloriesBurned || 0), 0) / summaries.length
-      );
-    }
-
-    res.json(stats);
+    res.json({
+      summaries,
+      avgWaterIntake: Math.round(avgWaterIntake),
+      avgSleepHours: parseFloat(avgSleepHours.toFixed(1)),
+      avgSteps: Math.round(avgSteps)
+    });
   } catch (error) {
     console.error("Error getting weekly stats:", error);
     res.status(500).json({ msg: error.message });
+  }
+};
+
+/**
+ * Helper function to create OAuth2 client
+ */
+const getOAuth2Client = () => {
+  return new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    process.env.GOOGLE_REDIRECT_URI || "postmessage"
+  );
+};
+
+/**
+ * Helper function to refresh access token
+ */
+const refreshAccessToken = async (user) => {
+  try {
+    const oauth2Client = getOAuth2Client();
+    oauth2Client.setCredentials({
+      refresh_token: user.googleFitRefreshToken
+    });
+
+    const { credentials } = await oauth2Client.refreshAccessToken();
+    
+    // Update user with new access token
+    user.googleFitAccessToken = credentials.access_token;
+    user.googleFitTokenExpiry = new Date(credentials.expiry_date);
+    await user.save();
+
+    return credentials.access_token;
+  } catch (error) {
+    console.error("Error refreshing Google Fit token:", error);
+    throw error;
+  }
+};
+
+/**
+ * Connect Google Fit - Store OAuth tokens
+ */
+export const connectGoogleFit = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { code, accessToken, refreshToken, expiryDate } = req.body;
+
+    let tokens = { accessToken, refreshToken, expiryDate };
+
+    // If code is provided, exchange it for tokens
+    if (code && !accessToken) {
+      const oauth2Client = getOAuth2Client();
+      const { tokens: exchangedTokens } = await oauth2Client.getToken(code);
+      tokens = {
+        accessToken: exchangedTokens.access_token,
+        refreshToken: exchangedTokens.refresh_token,
+        expiryDate: exchangedTokens.expiry_date
+      };
+    }
+
+    if (!tokens.accessToken) {
+      return res.status(400).json({ msg: "Access token is required" });
+    }
+
+    // Update user with Google Fit tokens
+    const user = await User.findByIdAndUpdate(
+      userId,
+      {
+        googleFitAccessToken: tokens.accessToken,
+        googleFitRefreshToken: tokens.refreshToken,
+        googleFitTokenExpiry: tokens.expiryDate ? new Date(tokens.expiryDate) : null,
+        googleFitConnected: true
+      },
+      { new: true }
+    );
+
+    res.json({ 
+      msg: "Google Fit connected successfully",
+      connected: true,
+      user: {
+        googleFitConnected: user.googleFitConnected
+      }
+    });
+  } catch (error) {
+    console.error("Error connecting Google Fit:", error);
+    res.status(500).json({ msg: error.message });
+  }
+};
+
+/**
+ * Disconnect Google Fit - Remove stored tokens
+ */
+export const disconnectGoogleFit = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    await User.findByIdAndUpdate(userId, {
+      googleFitAccessToken: null,
+      googleFitRefreshToken: null,
+      googleFitTokenExpiry: null,
+      googleFitConnected: false
+    });
+
+    res.json({ msg: "Google Fit disconnected successfully", connected: false });
+  } catch (error) {
+    console.error("Error disconnecting Google Fit:", error);
+    res.status(500).json({ msg: error.message });
+  }
+};
+
+/**
+ * Get Google Fit connection status
+ */
+export const getGoogleFitStatus = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const user = await User.findById(userId).select('googleFitConnected googleFitTokenExpiry');
+
+    res.json({
+      connected: user.googleFitConnected || false,
+      tokenExpiry: user.googleFitTokenExpiry
+    });
+  } catch (error) {
+    console.error("Error getting Google Fit status:", error);
+    res.status(500).json({ msg: error.message });
+  }
+};
+
+/**
+ * Sync steps from Google Fit
+ */
+export const syncGoogleFitSteps = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+
+    if (!user.googleFitConnected || !user.googleFitAccessToken) {
+      return res.status(400).json({ msg: "Google Fit not connected" });
+    }
+
+    // Check if token is expired and refresh if needed
+    if (user.googleFitTokenExpiry && new Date() > user.googleFitTokenExpiry) {
+      await refreshAccessToken(user);
+      // Reload user after token refresh
+      await user.reload();
+    }
+
+    // Get OAuth2 client
+    const oauth2Client = getOAuth2Client();
+    oauth2Client.setCredentials({
+      access_token: user.googleFitAccessToken,
+    });
+
+    const fitness = google.fitness({ version: 'v1', auth: oauth2Client });
+
+    // Get today's date elements in IST
+    const getISTDateParts = (date) => {
+      const parts = new Intl.DateTimeFormat('en-CA', { 
+        timeZone: 'Asia/Kolkata',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      }).formatToParts(date);
+      
+      const year = parts.find(p => p.type === 'year').value;
+      const month = parts.find(p => p.type === 'month').value;
+      const day = parts.find(p => p.type === 'day').value;
+      return { year, month, day };
+    };
+
+    const now = new Date();
+    const { year, month, day } = getISTDateParts(now);
+    const todayIST = `${year}-${month}-${day}`;
+    
+    // Construct exact ISO strings with +05:30 offset
+    // This creates unambiguous moments in time
+    const todayEndString = `${year}-${month}-${day}T23:59:59.999+05:30`;
+    const endTimeMillis = new Date(todayEndString).getTime();
+    
+    // Calculate 6 days ago
+    const todayDateObj = new Date(todayEndString); // This reads it as the correct moment
+    const sevenDaysAgoObj = new Date(todayDateObj);
+    sevenDaysAgoObj.setDate(todayDateObj.getDate() - 6);
+    
+    // Get IST parts for the start date
+    const startParts = getISTDateParts(sevenDaysAgoObj);
+    const startDateString = `${startParts.year}-${startParts.month}-${startParts.day}T00:00:00.000+05:30`;
+    const startTimeMillis = new Date(startDateString).getTime();
+
+    // Fetch step data from Google Fit for last 7 days
+    const response = await fitness.users.dataset.aggregate({
+      userId: 'me',
+      requestBody: {
+        aggregateBy: [{
+          dataTypeName: 'com.google.step_count.delta',
+        }],
+        bucketByTime: { durationMillis: 24 * 60 * 60 * 1000 },
+        startTimeMillis,
+        endTimeMillis,
+      },
+    });
+
+    let todaySteps = 0;
+    const istOffset = 19800000; // 5.5 * 60 * 60 * 1000
+
+    // Process each daily bucket
+    if (response.data.bucket) {
+      for (const bucket of response.data.bucket) {
+        let dailySteps = 0;
+        const bucketStartTime = parseInt(bucket.startTimeMillis);
+        
+        // Determine the date of this bucket in IST
+        // Center of the bucket check to avoid edge cases
+        const midBucketTime = bucketStartTime + (12 * 60 * 60 * 1000);
+        const { year, month, day } = getISTDateParts(new Date(midBucketTime));
+        const bucketDate = `${year}-${month}-${day}`;
+
+        const datasets = bucket.dataset || [];
+        datasets.forEach((ds) => {
+          (ds.point || []).forEach((pt) => {
+            if (pt.value && pt.value.length > 0 && pt.value[0].intVal) {
+              dailySteps += pt.value[0].intVal;
+            }
+          });
+        });
+
+        // Update DailySummary for this specific date
+        await DailySummary.findOneAndUpdate(
+          { user: userId, date: bucketDate },
+          { steps: dailySteps },
+          { new: true, upsert: true, setDefaultsOnInsert: true }
+        );
+
+        if (bucketDate === todayIST) {
+          todaySteps = dailySteps;
+        }
+      }
+    }
+
+    // Get the updated summary for today
+    const summary = await DailySummary.findOne({ user: userId, date: todayIST });
+
+    res.json({
+      steps: todaySteps,
+      lastSync: new Date(),
+      summary
+    });
+
+  } catch (error) {
+    console.error("Error syncing Google Fit steps:", error);
+    res.status(500).json({ msg: "Failed to sync Google Fit data" });
   }
 };

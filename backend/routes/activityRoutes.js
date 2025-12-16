@@ -8,6 +8,10 @@ import {
   updateWeight,
   getActivityHistory,
   getWeeklyStats,
+  connectGoogleFit,
+  disconnectGoogleFit,
+  syncGoogleFitSteps,
+  getGoogleFitStatus,
 } from "../controllers/activityController.js";
 import { protect } from "../middlewares/authMiddleware.js";
 
@@ -27,5 +31,11 @@ router.post("/water", updateWaterIntake);
 router.post("/steps", updateSteps);
 router.post("/sleep", updateSleep);
 router.post("/weight", updateWeight);
+
+// Google Fit integration
+router.post("/google-fit/connect", connectGoogleFit);
+router.post("/google-fit/disconnect", disconnectGoogleFit);
+router.get("/google-fit/sync", syncGoogleFitSteps);
+router.get("/google-fit/status", getGoogleFitStatus);
 
 export default router;

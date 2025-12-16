@@ -12,6 +12,13 @@ const userSchema = new mongoose.Schema(
     gender: { type: String, enum: ["male", "female", "other"] },
     provider: { type: String, enum: ["local", "google"], default: "local" },
     refreshToken: { type: String },
+    
+    // Google Fit Integration
+    googleFitAccessToken: { type: String },
+    googleFitRefreshToken: { type: String },
+    googleFitTokenExpiry: { type: Date },
+    googleFitConnected: { type: Boolean, default: false },
+    
     resetPasswordToken: String,
     resetPasswordExpires: Date,
     

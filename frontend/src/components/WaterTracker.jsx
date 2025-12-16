@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Droplet, Plus, Minus, CupSoda, Waves } from "lucide-react";
+import { Droplet, Plus, Minus, CupSoda, Waves, TrendingUp } from "lucide-react";
+import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 
 function WaterTracker() {
   const [waterIntake, setWaterIntake] = useState(0);
   const [waterGoal, setWaterGoal] = useState(2000);
+  const [weeklyData, setWeeklyData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [activeBar, setActiveBar] = useState(null);
 
   useEffect(() => {
     fetchTodaysSummary();
+    fetchWeeklyData();
   }, []);
 
   const fetchTodaysSummary = async () => {
@@ -18,12 +22,32 @@ function WaterTracker() {
         `${import.meta.env.VITE_API_URL}/api/activity/today`,
         { withCredentials: true }
       );
-      setWaterIntake(response.data.waterIntake || 0);
+      // Ensure water intake is never negative
+      setWaterIntake(Math.max(0, response.data.waterIntake || 0));
       setWaterGoal(response.data.waterGoal || 2000);
     } catch (error) {
       console.error("Error fetching water data:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchWeeklyData = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/activity/weekly-stats`,
+        { withCredentials: true }
+      );
+      
+      const chartData = response.data.summaries.map(s => ({
+        date: new Date(s.date).toLocaleDateString('en-US', { weekday: 'short' }),
+        intake: (s.waterIntake || 0) / 1000, // Convert to liters
+        goal: (s.waterGoal || 2000) / 1000
+      }));
+      
+      setWeeklyData(chartData);
+    } catch (error) {
+      console.error("Error fetching weekly water data:", error);
     }
   };
 
@@ -35,8 +59,11 @@ function WaterTracker() {
         { amount },
         { withCredentials: true }
       );
-      setWaterIntake(response.data.waterIntake);
+      // Ensure water intake is never negative
+      setWaterIntake(Math.max(0, response.data.waterIntake || 0));
       setTimeout(() => setIsAnimating(false), 1000);
+      // Refresh weekly data
+      fetchWeeklyData();
     } catch (error) {
       console.error("Error adding water:", error);
       setIsAnimating(false);
@@ -47,6 +74,24 @@ function WaterTracker() {
   
   // Wave height calculation: 100% full = 0% top, 0% full = 100% top
   const waveTop = 100 - percentage;
+
+  // Custom Tooltip
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white/90 backdrop-blur-md border border-cyan-100 p-3 rounded-2xl shadow-xl shadow-cyan-100/50">
+          <p className="font-bold text-slate-700 mb-1">{label}</p>
+          <div className="flex items-center gap-2">
+             <span className="w-2 h-2 bg-cyan-500 rounded-full"></span>
+             <p className="text-cyan-600 font-bold text-sm">
+                {payload[0].value.toFixed(2)}L
+             </p>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
 
   if (loading) return (
     <div className="h-full w-full bg-slate-100 rounded-3xl animate-pulse"></div>
@@ -81,9 +126,9 @@ function WaterTracker() {
       </div>
 
       {/* Liquid Wave Container */}
-      <div className="relative flex-1 w-full mt-6 mb-24 group-hover:scale-105 transition-transform duration-700 ease-in-out">
+      <div className="relative flex-1 w-full mt-6 mb-4 group-hover:scale-105 transition-transform duration-700 ease-in-out px-8">
          {/* Glass Container Bottle/Shape */}
-         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-64 bg-white/20 backdrop-blur-sm border-2 border-white/40 rounded-[3rem] shadow-inner overflow-hidden z-10">
+         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-48 bg-white/20 backdrop-blur-sm border-2 border-white/40 rounded-[3rem] shadow-inner overflow-hidden z-10">
             
             {/* The Liquid */}
             <div 
@@ -95,31 +140,68 @@ function WaterTracker() {
                <div className="absolute top-[-5px] left-0 w-[200%] h-6 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAwIDEyMCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PHBhdGggZD0iTTAgMjRWYy41LjkuNSAyNC0yNC0yNC01NC45IDAgMTA5LjUgMCA5OS41IDAgMTUyLjUgMCAyLjMgMy44IDUuMyA3LjggOSA5LjggNi42IDMuNSAxMy44IDMuNyAyMC41IDMuNyA2Ny0uNSA4OS0zLjUgOTguNS0zLjUgMTA5LjUtMy41IDEyMDAgMjRWOS41VjBIMHoiIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC41Ii8+PC9zdmc+')] bg-repeat-x opacity-60 animate-wave" style={{ animationDuration: '7s' }}></div>
             </div>
             
-            {/* Measurement Lines */}
-            <div className="absolute right-0 top-0 bottom-0 w-8 flex flex-col justify-between py-8 pr-3 pointer-events-none">
-               {[100, 75, 50, 25].map(tick => (
-                  <div key={tick} className="w-full h-px bg-white/40 relative">
-                     <span className="absolute right-0 -top-2 text-[10px] font-bold text-white/80">{tick}%</span>
-                  </div>
-               ))}
-            </div>
-
             {/* Floating text inside */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <span className={`text-3xl font-black drop-shadow-md transition-colors duration-500 ${percentage > 50 ? 'text-white' : 'text-slate-400/50'}`}>
+              <span className={`text-2xl font-black drop-shadow-md transition-colors duration-500 ${percentage > 50 ? 'text-white' : 'text-slate-400/50'}`}>
                 {(waterIntake / 1000).toFixed(2)}L
               </span>
             </div>
          </div>
       </div>
 
+      {/* Weekly Trend Bar Chart */}
+      <div className="relative z-10 px-8 mb-4">
+        <div className="flex justify-between items-end mb-3">
+           <div className="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+              <TrendingUp size={12} /> 7 Day Trend
+           </div>
+        </div>
+        
+        <div className="h-24 w-full bg-white/50 rounded-2xl border border-white p-2 shadow-sm">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={weeklyData} onMouseMove={(state) => setActiveBar(state.activeTooltipIndex)} onMouseLeave={() => setActiveBar(null)} barCategoryGap="2%">
+              <Tooltip cursor={{fill: 'transparent'}} content={<CustomTooltip />} />
+              <XAxis 
+                dataKey="date" 
+                tick={{fill: '#64748b', fontSize: 10, fontWeight: 600}} 
+                axisLine={false} 
+                tickLine={false} 
+                padding={{left: 0, right: 0}}
+                dy={5}
+              />
+              <Bar dataKey="intake" radius={[4, 4, 4, 4]}>
+                {weeklyData.map((entry, index) => (
+                  <Cell 
+                    key={`cell-${index}`} 
+                    fill={index === activeBar ? '#0891b2' : 'url(#waterGradient)'} 
+                    className="transition-all duration-300"
+                  />
+                ))}
+              </Bar>
+              <defs>
+                <linearGradient id="waterGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#06b6d4" />
+                  <stop offset="100%" stopColor="#a5f3fc" />
+                </linearGradient>
+              </defs>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
       {/* Footer Controls - Glassmorphism Floating Dock */}
-      <div className="absolute bottom-6 left-6 right-6">
+      <div className="relative z-10 px-8 pb-6">
          <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-2 shadow-lg border border-white/50 flex items-center justify-around gap-2">
             
             <button 
               onClick={() => addWater(-250)}
-              className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors"
+              disabled={waterIntake === 0}
+              className={`w-10 h-10 flex items-center justify-center rounded-xl transition-colors ${
+                waterIntake === 0 
+                  ? 'bg-slate-100 text-slate-300 cursor-not-allowed' 
+                  : 'hover:bg-red-50 text-slate-400 hover:text-red-500'
+              }`}
+              title={waterIntake === 0 ? "Cannot go below 0ml" : "Subtract 250ml"}
             >
               <Minus size={18} />
             </button>
