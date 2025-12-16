@@ -81,6 +81,23 @@ const Navbar = ({ user, logout }) => {
       <div className="w-full max-w-7xl flex items-center justify-between rounded-3xl bg-white/90 backdrop-blur-xl shadow-lg px-3 sm:px-6 py-2 sm:py-3">
         {/* Left: Logo + App name */}
         <div className="flex items-center gap-2 sm:gap-3">
+          <button 
+            onClick={() => navigate('/')}
+            className="p-1.5 sm:p-2 rounded-full text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-300 mr-1 sm:mr-2"
+            aria-label="Back to Home"
+          >
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              className="h-5 w-5 sm:h-6 sm:w-6" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor" 
+              strokeWidth={2}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+          </button>
+
           <div className="flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 rounded-xl overflow-hidden bg-linear-to-tr from-sky-500 to-indigo-500 text-white shadow-md">
             <img
               src={logo}

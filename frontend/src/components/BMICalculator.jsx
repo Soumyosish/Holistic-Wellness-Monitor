@@ -160,7 +160,7 @@ const BMICalculator = () => {
     );
   };
   return (
-    <div className="bg-white w-full rounded-4xl p-6 shadow-sm border border-gray-100 flex flex-col h-full overflow-hidden relative">
+    <div className="bg-white w-full rounded-4xl p-6 shadow-sm border border-gray-100 flex flex-col h-full relative">
       <h2 className="text-lg font-bold text-gray-800 mb-6">BMI Calculator</h2>
       {/* Top Section: Inputs & Result */}
       <div className="grid grid-cols-2 gap-x-5 gap-y-5 mb-2 relative z-10">
@@ -311,8 +311,10 @@ const BMICalculator = () => {
         <img
           src={body}
           alt="Holistic Wellness Monitor Logo"
-          className="h-full w-full object-cover"
+          className="h-full w-full object-cover rounded-xl"
         />
+        <BodyPoint top="25%" left="48%" label="Chest (in)" value="44.5" side="left" />
+        <BodyPoint top="45%" left="48%" label="Waist" value="34" side="left" />
       </div>
     </div>
   );

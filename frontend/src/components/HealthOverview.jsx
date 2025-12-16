@@ -60,226 +60,236 @@ const HealthOverview = () => {
     }
     return "Normal";
   };
+
   return (
-    <div className="bg-white/90 backdrop-blur-xl rounded-[28px] shadow-[0_18px_40px_rgba(15,23,42,0.08)] p-5 sm:p-6 lg:p-7 border border-slate-100">
+    <div className="bg-white/70 backdrop-blur-2xl rounded-[32px] shadow-[0_20px_50px_-12px_rgba(79,70,229,0.1)] p-6 sm:p-7 lg:p-8 border border-white/50 relative overflow-hidden group hover:shadow-[0_25px_60px_-12px_rgba(79,70,229,0.15)] transition-all duration-500">
+      {/* Decorative gradient blob */}
+      <div className="absolute -top-20 -right-20 w-64 h-64 bg-fuchsia-100/30 rounded-full blur-3xl pointer-events-none group-hover:bg-fuchsia-100/50 transition-colors duration-700"></div>
+      
       {/* Header */}
-      <div className="flex items-center justify-between mb-5 sm:mb-6">
+      <div className="flex items-center justify-between mb-8 relative z-10">
         <div>
-          <h2 className="text-lg sm:text-xl font-semibold text-slate-900">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">
             Health Overview
           </h2>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-sm text-slate-500 mt-1.5 font-medium">
             Live insight into your key health metrics
           </p>
         </div>
       </div>
+
       {/* Main grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-7 items-stretch">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch relative z-10">
         {/* Left Column: Heart + quick stats */}
-        <div className="space-y-5">
+        <div className="space-y-6">
           {/* Heart Image Container */}
-          <div className="relative h-64 sm:h-72 rounded-3xl overflow-hidden border border-sky-100 bg-linear-to-br from-sky-50 via-white to-indigo-50 shadow-[0_16px_35px_rgba(56,189,248,0.25)]">
+          <div className="relative h-64 sm:h-80 rounded-[2rem] overflow-hidden border border-white/60 bg-gradient-to-br from-indigo-50/50 via-white/80 to-purple-50/50 shadow-[0_15px_35px_-10px_rgba(99,102,241,0.15)] group/heart transition-transform hover:scale-[1.01] duration-500">
             {/* Zoomable heart image */}
             <img
               src={heart}
               alt="Heart Visualization"
-              className="absolute inset-0 w-full h-full object-contain opacity-80 mix-blend-multiply transition-transform duration-300 ease-out"
+              className="absolute inset-0 w-full h-full object-contain opacity-90 mix-blend-multiply transition-transform duration-500 ease-out p-6"
               style={{ transform: `scale(${heartZoom})` }}
             />
+            
             {/* Zoom controls */}
-            <div className="absolute top-3 right-3 flex items-center gap-1 bg-white/80 backdrop-blur-sm rounded-full px-2 py-1 shadow-sm">
-              <button
-                type="button"
-                onClick={() => setHeartZoom((z) => Math.max(0.8, z - 0.1))}
-                className="w-6 h-6 flex items-center justify-center rounded-full border border-slate-200 text-[#20b2aa] text-sm leading-none font-bold"
-              >
-                −
-              </button>
+            <div className="absolute top-4 right-4 flex flex-col gap-2 opacity-0 group-hover/heart:opacity-100 transition-opacity duration-300">
               <button
                 type="button"
                 onClick={() => setHeartZoom((z) => Math.min(1.4, z + 0.1))}
-                className="w-6 h-6 flex items-center justify-center rounded-full border border-slate-200 text-[#20b2aa] text-sm leading-none font-bold"
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-white/90 backdrop-blur text-indigo-600 shadow-sm hover:bg-indigo-50 transition-colors"
+                aria-label="Zoom in"
               >
-                +
+                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                onClick={() => setHeartZoom((z) => Math.max(0.8, z - 0.1))}
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-white/90 backdrop-blur text-indigo-600 shadow-sm hover:bg-indigo-50 transition-colors"
+                aria-label="Zoom out"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M20 12H4" />
+                </svg>
               </button>
             </div>
+            
+            {/* Decorative subtle grid */}
+            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoOTksIDEwMiwgMjQxLCAwLjAzKSIvPjwvc3ZnPg==')] opacity-50 pointer-events-none"></div>
           </div>
+
           {/* Quick Stats */}
-          <div className="grid grid-cols-2 gap-3 sm:gap-4">
-            <div className="bg-linear-to-br from-orange-50 via-white to-orange-100 rounded-2xl p-3.5 sm:p-4 border border-orange-100 shadow-sm">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[11px] font-semibold text-orange-700 uppercase tracking-wide">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-gradient-to-br from-amber-50/80 to-orange-50/50 rounded-2xl p-5 border border-amber-100/60 shadow-[0_8px_20px_-8px_rgba(251,191,36,0.15)] hover:shadow-[0_12px_24px_-8px_rgba(251,191,36,0.25)] transition-all duration-300">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[11px] font-bold text-amber-700/80 uppercase tracking-wider">
                   Blood Sugar
                 </span>
                 <div
-                  className={`text-[10px] font-semibold px-2 py-1 rounded-full border ${getStatusColor(
-                    metrics.bloodSugar,
-                    "bloodSugar"
-                  )}`}
-                >
-                  {getStatusText(metrics.bloodSugar, "bloodSugar")}
-                </div>
+                  className={`w-2 h-2 rounded-full ${
+                    metrics.bloodSugar < 70 ? 'bg-amber-400' : metrics.bloodSugar <= 140 ? 'bg-emerald-400' : 'bg-rose-400'
+                  } shadow-[0_0_8px_rgba(251,191,36,0.5)]`}
+                />
               </div>
-              <div className="text-2xl font-semibold text-slate-900">
-                {metrics.bloodSugar}
-                <span className="ml-1 text-xs text-slate-500 font-medium">
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-3xl font-bold text-slate-800 tracking-tight">
+                  {metrics.bloodSugar}
+                </span>
+                <span className="text-xs text-slate-500 font-semibold uppercase">
                   mg/dL
                 </span>
               </div>
-              <p className="mt-1 text-[11px] text-slate-400">
-                Target range 70–140
-              </p>
+              <div className={`mt-2 text-xs font-medium px-2 py-1 rounded-lg inline-block ${getStatusColor(metrics.bloodSugar, "bloodSugar")}`}>
+                {getStatusText(metrics.bloodSugar, "bloodSugar")}
+              </div>
             </div>
-            <div className="bg-linear-to-br from-red-50 via-white to-rose-100 rounded-2xl p-3.5 sm:p-4 border border-rose-100 shadow-sm">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[11px] font-semibold text-rose-700 uppercase tracking-wide">
+
+            <div className="bg-gradient-to-br from-rose-50/80 to-pink-50/50 rounded-2xl p-5 border border-rose-100/60 shadow-[0_8px_20px_-8px_rgba(244,63,94,0.15)] hover:shadow-[0_12px_24px_-8px_rgba(244,63,94,0.25)] transition-all duration-300">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[11px] font-bold text-rose-700/80 uppercase tracking-wider">
                   Heart Rate
                 </span>
-                <div
-                  className={`text-[10px] font-semibold px-2 py-1 rounded-full border ${getStatusColor(
-                    metrics.heartRate,
-                    "heartRate"
-                  )}`}
-                >
-                  {getStatusText(metrics.heartRate, "heartRate")}
-                </div>
+                 <div
+                  className={`w-2 h-2 rounded-full ${
+                    metrics.heartRate < 60 ? 'bg-amber-400' : metrics.heartRate <= 100 ? 'bg-emerald-400' : 'bg-rose-400'
+                  } shadow-[0_0_8px_rgba(244,63,94,0.5)]`}
+                />
               </div>
-              <div className="text-2xl font-semibold text-slate-900">
-                {metrics.heartRate}
-                <span className="ml-1 text-xs text-slate-500 font-medium">
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-3xl font-bold text-slate-800 tracking-tight">
+                  {metrics.heartRate}
+                </span>
+                <span className="text-xs text-slate-500 font-semibold uppercase">
                   bpm
                 </span>
               </div>
-              <p className="mt-1 text-[11px] text-slate-400">
-                Ideal resting 60–100 bpm
-              </p>
+               <div className={`mt-2 text-xs font-medium px-2 py-1 rounded-lg inline-block ${getStatusColor(metrics.heartRate, "heartRate")}`}>
+                {getStatusText(metrics.heartRate, "heartRate")}
+              </div>
             </div>
           </div>
         </div>
+
         {/* Right Column: Detailed Metrics with Sliders */}
-        <div className="space-y-4 sm:space-y-5">
+        <div className="space-y-5 flex flex-col justify-center">
           {/* Blood Sugar Slider */}
-          <div className="bg-slate-50/80 rounded-2xl p-4 sm:p-5 border border-slate-100 shadow-sm">
-            <div className="flex items-center justify-between mb-3.5">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-linear-to-br from-orange-100 to-amber-50 border border-orange-200 flex items-center justify-center overflow-hidden">
-                  <img
-                    src={bloodsugar}
-                    alt="Blood sugar"
-                    className="w-8 h-8 object-contain"
-                  />
-                </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-slate-900">
-                    Blood Sugar
-                  </h3>
-                  <p className="text-[11px] text-slate-400">mg/dL • fasting</p>
-                </div>
+          <div className="bg-white/60 rounded-3xl p-6 border border-white/50 shadow-[0_4px_20px_-4px_rgba(148,163,184,0.1)] hover:shadow-[0_8px_25px_-5px_rgba(148,163,184,0.15)] transition-all duration-300 backdrop-blur-sm">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-100 to-amber-50 border border-orange-200/50 flex items-center justify-center shadow-inner">
+                <img
+                  src={bloodsugar}
+                  alt="Blood sugar"
+                  className="w-6 h-6 object-contain drop-shadow-sm"
+                />
               </div>
-              <div className="text-2xl font-semibold text-slate-900">
-                {metrics.bloodSugar}
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-base font-bold text-slate-800">Blood Sugar</h3>
+                  <span className="text-xl font-bold text-slate-700 tabular-nums">{metrics.bloodSugar}</span>
+                </div>
+                <p className="text-xs text-slate-500 font-medium">Fasting Concentration</p>
               </div>
             </div>
-            <div className="space-y-2">
-              <input
+            
+            <div className="px-2 relative">
+                <input
                 type="range"
                 min="50"
                 max="200"
                 value={metrics.bloodSugar}
                 onChange={(e) => updateBloodSugar(parseInt(e.target.value))}
-                className="w-full h-2 bg-linear-to-r from-emerald-400 via-amber-400 to-rose-500 rounded-full appearance-none cursor-pointer
-                  [&::-webkit-slider-thumb]:appearance-none
-                  [&::-webkit-slider-thumb]:h-5
-                  [&::-webkit-slider-thumb]:w-5
-                  [&::-webkit-slider-thumb]:rounded-full
-                  [&::-webkit-slider-thumb]:bg-white
-                  [&::-webkit-slider-thumb]:border-2
-                  [&::-webkit-slider-thumb]:border-sky-500
-                  [&::-webkit-slider-thumb]:shadow-md"
-              />
-              <div className="flex justify-between text-[11px] text-slate-400 px-0.5">
-                <span>50</span>
-                <span>100</span>
-                <span>200</span>
+                className="w-full h-3 bg-slate-200 rounded-full appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-200/50"
+                  style={{
+                    background: `linear-gradient(to right, #10b981 0%, #fbbf24 60%, #f43f5e 100%)`
+                  }}
+                />
+                <style jsx>{`
+                    input[type=range]::-webkit-slider-thumb {
+                        -webkit-appearance: none;
+                        height: 20px;
+                        width: 20px;
+                        border-radius: 50%;
+                        background: #fff;
+                        border: 3px solid #fff;
+                        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+                        margin-top: -4px; 
+                    }
+                `}</style>
+               <div className="flex justify-between text-[10px] font-semibold text-slate-400 mt-2 tracking-wide uppercase">
+                <span>Low</span>
+                <span>Normal</span>
+                <span>High</span>
               </div>
             </div>
           </div>
+
           {/* Heart Rate Slider */}
-          <div className="bg-slate-50/80 rounded-2xl p-4 sm:p-5 border border-slate-100 shadow-sm">
-            <div className="flex items-center justify-between mb-3.5">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-linear-to-br from-rose-100 to-rose-50 border border-rose-200 flex items-center justify-center overflow-hidden">
-                  <img
-                    src={heartRate}
-                    alt="Heart rate"
-                    className="w-8 h-8 object-contain"
-                  />
-                </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-slate-900">
-                    Heart Rate
-                  </h3>
-                  <p className="text-[11px] text-slate-400">bpm • resting</p>
-                </div>
+          <div className="bg-white/60 rounded-3xl p-6 border border-white/50 shadow-[0_4px_20px_-4px_rgba(148,163,184,0.1)] hover:shadow-[0_8px_25px_-5px_rgba(148,163,184,0.15)] transition-all duration-300 backdrop-blur-sm">
+             <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-100 to-pink-50 border border-rose-200/50 flex items-center justify-center shadow-inner">
+                <img
+                  src={heartRate}
+                  alt="Heart rate"
+                  className="w-6 h-6 object-contain drop-shadow-sm"
+                />
               </div>
-              <div className="text-2xl font-semibold text-slate-900">
-                {metrics.heartRate}
+               <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-base font-bold text-slate-800">Heart Rate</h3>
+                  <span className="text-xl font-bold text-slate-700 tabular-nums">{metrics.heartRate}</span>
+                </div>
+                <p className="text-xs text-slate-500 font-medium">Beats Per Minute</p>
               </div>
             </div>
-            <div className="space-y-2">
-              <input
+             <div className="px-2">
+                 <input
                 type="range"
                 min="40"
                 max="120"
                 value={metrics.heartRate}
                 onChange={(e) => updateHeartRate(parseInt(e.target.value))}
-                className="w-full h-2 bg-linear-to-r from-emerald-400 via-amber-400 to-rose-500 rounded-full appearance-none cursor-pointer
-                  [&::-webkit-slider-thumb]:appearance-none
-                  [&::-webkit-slider-thumb]:h-5
-                  [&::-webkit-slider-thumb]:w-5
-                  [&::-webkit-slider-thumb]:rounded-full
-                  [&::-webkit-slider-thumb]:bg-white
-                  [&::-webkit-slider-thumb]:border-2
-                  [&::-webkit-slider-thumb]:border-sky-500
-                  [&::-webkit-slider-thumb]:shadow-md"
+                className="w-full h-3 bg-slate-200 rounded-full appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-200/50"
+                  style={{
+                    background: `linear-gradient(to right, #10b981 0%, #fbbf24 60%, #f43f5e 100%)`
+                  }}
               />
-              <div className="flex justify-between text-[11px] text-slate-400 px-0.5">
-                <span>40</span>
-                <span>80</span>
-                <span>120</span>
+              <div className="flex justify-between text-[10px] font-semibold text-slate-400 mt-2 tracking-wide uppercase">
+                <span>Resting</span>
+                <span>Active</span>
+                <span>Peak</span>
               </div>
             </div>
           </div>
+
           {/* Blood Pressure Slider */}
-          <div className="bg-slate-50/80 rounded-2xl p-4 sm:p-5 border border-slate-100 shadow-sm">
-            <div className="flex items-center justify-between mb-3.5">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-linear-to-br from-violet-100 to-indigo-50 border border-violet-200 flex items-center justify-center overflow-hidden">
-                  <img
-                    src={bloodpressure}
-                    alt="Blood pressure"
-                    className="w-8 h-8 object-contain"
-                  />
-                </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-slate-900">
-                    Blood Pressure
-                  </h3>
-                  <p className="text-[11px] text-slate-400">mmHg</p>
-                </div>
+          <div className="bg-white/60 rounded-3xl p-6 border border-white/50 shadow-[0_4px_20px_-4px_rgba(148,163,184,0.1)] hover:shadow-[0_8px_25px_-5px_rgba(148,163,184,0.15)] transition-all duration-300 backdrop-blur-sm">
+             <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-100 to-violet-50 border border-indigo-200/50 flex items-center justify-center shadow-inner">
+                <img
+                  src={bloodpressure}
+                  alt="Blood pressure"
+                  className="w-6 h-6 object-contain drop-shadow-sm"
+                />
               </div>
-              <div className="text-2xl font-semibold text-slate-900">
-                {metrics.bloodPressure.systolic}/
-                {metrics.bloodPressure.diastolic}
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-base font-bold text-slate-800">Blood Pressure</h3>
+                   <div className="flex items-baseline gap-0.5">
+                    <span className="text-xl font-bold text-slate-700 tabular-nums">{metrics.bloodPressure.systolic}</span>
+                    <span className="text-slate-400">/</span>
+                    <span className="text-lg font-semibold text-slate-600 tabular-nums">{metrics.bloodPressure.diastolic}</span>
+                   </div>
+                </div>
+                <p className="text-xs text-slate-500 font-medium">Systolic & Diastolic</p>
               </div>
             </div>
-            <div className="space-y-3">
+            
+            <div className="space-y-6">
               <div>
-                <div className="flex justify-between text-xs text-slate-500 mb-1.5">
+                <div className="flex justify-between text-xs text-slate-500 mb-2 font-medium px-1">
                   <span>Systolic</span>
-                  <span className="font-medium">
-                    {metrics.bloodPressure.systolic}
-                  </span>
                 </div>
                 <input
                   type="range"
@@ -289,23 +299,15 @@ const HealthOverview = () => {
                   onChange={(e) =>
                     updateBloodPressure("systolic", parseInt(e.target.value))
                   }
-                  className="w-full h-2 bg-linear-to-r from-emerald-400 via-amber-400 to-rose-500 rounded-full appearance-none cursor-pointer
-                    [&::-webkit-slider-thumb]:appearance-none
-                    [&::-webkit-slider-thumb]:h-5
-                    [&::-webkit-slider-thumb]:w-5
-                    [&::-webkit-slider-thumb]:rounded-full
-                    [&::-webkit-slider-thumb]:bg-white
-                    [&::-webkit-slider-thumb]:border-2
-                    [&::-webkit-slider-thumb]:border-sky-500
-                    [&::-webkit-slider-thumb]:shadow-md"
+                  className="w-full h-3 bg-slate-200 rounded-full appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-200/50"
+                  style={{
+                    background: `linear-gradient(to right, #10b981 0%, #fbbf24 60%, #f43f5e 100%)`
+                  }}
                 />
               </div>
               <div>
-                <div className="flex justify-between text-xs text-slate-500 mb-1.5">
+                <div className="flex justify-between text-xs text-slate-500 mb-2 font-medium px-1">
                   <span>Diastolic</span>
-                  <span className="font-medium">
-                    {metrics.bloodPressure.diastolic}
-                  </span>
                 </div>
                 <input
                   type="range"
@@ -315,101 +317,61 @@ const HealthOverview = () => {
                   onChange={(e) =>
                     updateBloodPressure("diastolic", parseInt(e.target.value))
                   }
-                  className="w-full h-2 bg-linear-to-r from-emerald-400 via-amber-400 to-rose-500 rounded-full appearance-none cursor-pointer
-                    [&::-webkit-slider-thumb]:appearance-none
-                    [&::-webkit-slider-thumb]:h-5
-                    [&::-webkit-slider-thumb]:w-5
-                    [&::-webkit-slider-thumb]:rounded-full
-                    [&::-webkit-slider-thumb]:bg-white
-                    [&::-webkit-slider-thumb]:border-2
-                    [&::-webkit-slider-thumb]:border-sky-500
-                    [&::-webkit-slider-thumb]:shadow-md"
+                  className="w-full h-3 bg-slate-200 rounded-full appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-200/50"
+                  style={{
+                    background: `linear-gradient(to right, #10b981 0%, #fbbf24 60%, #f43f5e 100%)`
+                  }}
                 />
               </div>
             </div>
           </div>
         </div>
       </div>
+
       {/* Status Summary */}
-      <div className="mt-7 pt-5 border-t border-slate-100">
-        <h3 className="text-sm font-semibold text-slate-900 mb-3.5">
-          Health status summary
+      <div className="mt-8 pt-6 border-t border-slate-100/60 relative z-10">
+        <h3 className="text-sm font-bold text-slate-700 mb-4 tracking-tight">
+          Health Status Summary
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3.5">
-          <div className="bg-linear-to-r from-emerald-50 to-green-50 rounded-2xl p-4 border border-emerald-100">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center">
-                <svg
-                  className="w-4 h-4 text-emerald-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="group bg-emerald-50/50 hover:bg-emerald-50 rounded-2xl p-4 border border-emerald-100/50 transition-colors duration-300">
+            <div className="flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-emerald-100/80 flex items-center justify-center text-emerald-600 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-800">
-                  Overall health
-                </p>
-                <p className="text-xs text-emerald-600 font-medium">Good</p>
+                <p className="text-xs font-semibold text-emerald-600 uppercase tracking-wide mb-0.5">Overall</p>
+                <p className="text-sm font-bold text-slate-700">Excellent Condition</p>
               </div>
             </div>
           </div>
-          <div className="bg-linear-to-r from-sky-50 to-blue-50 rounded-2xl p-4 border border-sky-100">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-sky-100 flex items-center justify-center">
-                <svg
-                  className="w-4 h-4 text-sky-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
+
+          <div className="group bg-sky-50/50 hover:bg-sky-50 rounded-2xl p-4 border border-sky-100/50 transition-colors duration-300">
+            <div className="flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-sky-100/80 flex items-center justify-center text-sky-600 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-800">
-                  Last check‑up
-                </p>
-                <p className="text-xs text-sky-600 font-medium">2 days ago</p>
+                <p className="text-xs font-semibold text-sky-600 uppercase tracking-wide mb-0.5">Check-up</p>
+                <p className="text-sm font-bold text-slate-700">2 Days Ago</p>
               </div>
             </div>
           </div>
-          <div className="bg-linear-to-r from-violet-50 to-fuchsia-50 rounded-2xl p-4 border border-violet-100">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-violet-100 flex items-center justify-center">
-                <svg
-                  className="w-4 h-4 text-violet-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
+
+          <div className="group bg-violet-50/50 hover:bg-violet-50 rounded-2xl p-4 border border-violet-100/50 transition-colors duration-300">
+            <div className="flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-violet-100/80 flex items-center justify-center text-violet-600 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-800">
-                  Next appointment
-                </p>
-                <p className="text-xs text-violet-600 font-medium">
-                  Feb 16, 2026
-                </p>
+                <p className="text-xs font-semibold text-violet-600 uppercase tracking-wide mb-0.5">Next Visit</p>
+                <p className="text-sm font-bold text-slate-700">Feb 16, 2026</p>
               </div>
             </div>
           </div>
@@ -418,4 +380,5 @@ const HealthOverview = () => {
     </div>
   );
 };
+
 export default HealthOverview;
