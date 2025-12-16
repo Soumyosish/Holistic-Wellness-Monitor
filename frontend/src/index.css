@@ -5,10 +5,10 @@
   scroll-behavior: smooth;
 }
 
-body {
+/* body {
   background-color: #050505;
   color: #ffffff;
-}
+} */
 
 @layer utilities {
   @keyframes blob {

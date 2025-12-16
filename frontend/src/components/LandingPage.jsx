@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import axios from "axios";
 import email from "../assets/email.jpg";
 import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import {
@@ -1126,6 +1127,38 @@ const LandingPage = () => {
     navigate("/login");
   };
 
+  // Newsletter state
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [newsletterStatus, setNewsletterStatus] = useState("");
+
+  const handleSubscribe = async () => {
+    if (!newsletterEmail) return;
+    
+    try {
+      // Use existing API base URL logic or default
+      const API_BASE_URL = import.meta.env.VITE_API_URL
+        ? `${import.meta.env.VITE_API_URL.replace(/\/$/, "")}/api`
+        : "http://localhost:8000/api";
+
+      const response = await axios.post(`${API_BASE_URL}/newsletter`, {
+        email: newsletterEmail
+      });
+
+      if (response.data.success) {
+        setNewsletterStatus("You have been subscribed");
+        setNewsletterEmail("");
+        setTimeout(() => {
+          setNewsletterStatus("");
+        }, 3000);
+      }
+    } catch (error) {
+      setNewsletterStatus(error.response?.data?.msg || "Subscription failed");
+      setTimeout(() => {
+        setNewsletterStatus("");
+      }, 3000);
+    }
+  };
+
   const scrollToSection = (sectionId) => {
     setActiveNav(sectionId);
     if (sectionId === "home") {
@@ -1728,13 +1761,27 @@ const LandingPage = () => {
               <div className="relative group">
                  <input 
                     type="email" 
-                    placeholder="Enter email" 
+                    placeholder="Enter email"
+                    value={newsletterEmail}
+                    onChange={(e) => setNewsletterEmail(e.target.value)}
                     className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-sm focus:border-orange-500 focus:bg-white/10 focus:outline-none transition-all text-white placeholder-gray-600 pr-10"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleSubscribe();
+                      }
+                    }}
                  />
-                 <button className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-orange-500 rounded-lg text-white opacity-0 group-focus-within:opacity-100 transition-all hover:bg-orange-600">
+                 <button 
+                  onClick={handleSubscribe}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-orange-500 rounded-lg text-white opacity-0 group-focus-within:opacity-100 transition-all hover:bg-orange-600">
                     <ArrowRight size={14} />
                  </button>
               </div>
+              {newsletterStatus && (
+                <div className={`text-xs mt-2 ${newsletterStatus.includes("success") || newsletterStatus.includes("subscribed") ? "text-green-500" : "text-red-500"}`}>
+                  {newsletterStatus}
+                </div>
+              )}
             </div>
           </div>
 
