@@ -94,11 +94,14 @@ export const forgotPassword = async (req, res) => {
     user.resetPasswordToken = token;
     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
     await user.save();
-    
+
     // Use env variable or default
     const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
-    const resetUrl = `${FRONTEND_URL.replace(/\/$/, "")}/reset-password/${token}`;
-    
+    const resetUrl = `${FRONTEND_URL.replace(
+      /\/$/,
+      ""
+    )}/reset-password/${token}`;
+
     const message = `
       <p>You requested a password reset</p>
       <p>Click <a href="${resetUrl}">here</a> to reset your password.</p>
@@ -114,13 +117,14 @@ export const forgotPassword = async (req, res) => {
 
       // Check if simulated by checking env (simplified for response)
       const isSimulated = !process.env.EMAIL_USER || !process.env.EMAIL_PASS;
-      
+
       res.status(200).json({
         success: true,
-        data: isSimulated ? "Password reset email sent (Simulated)" : "Password reset email sent",
+        data: isSimulated
+          ? "Password reset email sent (Simulated)"
+          : "Password reset email sent",
         resetUrl: isSimulated ? resetUrl : undefined,
       });
-
     } catch (err) {
       console.error("Email send error:", err);
       // Clean up fields on failure

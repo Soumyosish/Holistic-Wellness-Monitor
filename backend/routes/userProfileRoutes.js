@@ -9,8 +9,6 @@ import {
 import { protect } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
-
-// All routes require authentication
 router.use(protect);
 
 // Get user profile

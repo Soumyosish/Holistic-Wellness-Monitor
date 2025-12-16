@@ -1,6 +1,8 @@
-// routes/summaryRoutes.js
 import express from "express";
-import { getSummaryByDate, updateSummary } from "../controllers/summaryController.js";
+import {
+  getSummaryByDate,
+  updateSummary,
+} from "../controllers/summaryController.js";
 import { protect } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();

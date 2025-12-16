@@ -85,6 +85,7 @@ const useScrollAnimation = () => {
 
     return () => {
       if (elementRef.current) {
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         observer.unobserve(elementRef.current);
       }
     };
@@ -173,7 +174,7 @@ const BMICalculator = () => {
     <div className="bg-emerald-950/20 backdrop-blur-xl border border-emerald-500/20 rounded-3xl p-6 h-full flex flex-col justify-between hover:border-emerald-500/50 transition-colors duration-500 hover:shadow-[0_0_30px_rgba(16,185,129,0.1)]">
       <div className="flex items-center gap-2 mb-6">
         <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-           <Scale className="text-emerald-500" size={20} />
+          <Scale className="text-emerald-500" size={20} />
         </div>
         <h3 className="text-lg font-bold text-white">BMI Calculator</h3>
       </div>
@@ -211,8 +212,12 @@ const BMICalculator = () => {
       </div>
 
       <div className="text-center mb-6 p-4 rounded-2xl bg-white/5 border border-white/5">
-        <div className="text-5xl font-extrabold text-white mb-1 tracking-tight">{bmi}</div>
-        <div className={`text-sm font-bold uppercase tracking-wide ${bmiStatus.color}`}>
+        <div className="text-5xl font-extrabold text-white mb-1 tracking-tight">
+          {bmi}
+        </div>
+        <div
+          className={`text-sm font-bold uppercase tracking-wide ${bmiStatus.color}`}
+        >
           {bmiStatus.status}
         </div>
         <div className="text-xs text-gray-500 mt-2">Body Mass Index</div>
@@ -220,11 +225,15 @@ const BMICalculator = () => {
 
       <div className="grid grid-cols-2 gap-4 text-center">
         <div className="p-3 rounded-xl bg-white/5 border border-white/5">
-          <div className="text-xs text-gray-400 mb-1 uppercase tracking-wider">Chest</div>
+          <div className="text-xs text-gray-400 mb-1 uppercase tracking-wider">
+            Chest
+          </div>
           <div className="text-lg font-bold text-white">44.5"</div>
         </div>
         <div className="p-3 rounded-xl bg-white/5 border border-white/5">
-          <div className="text-xs text-gray-400 mb-1 uppercase tracking-wider">Waist</div>
+          <div className="text-xs text-gray-400 mb-1 uppercase tracking-wider">
+            Waist
+          </div>
           <div className="text-lg font-bold text-white">34"</div>
         </div>
       </div>
@@ -446,12 +455,14 @@ const WaterIntakeChart = () => {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <div className="p-2 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
-             <Droplets className="text-cyan-500" size={20} />
+            <Droplets className="text-cyan-500" size={20} />
           </div>
           <h3 className="text-lg font-bold text-white">Hydration</h3>
         </div>
         <div className="text-right">
-          <div className="text-2xl font-bold text-white leading-none">{totalIntake}ml</div>
+          <div className="text-2xl font-bold text-white leading-none">
+            {totalIntake}ml
+          </div>
           <div className="text-xs text-gray-400">Goal: {dailyGoal}ml</div>
         </div>
       </div>
@@ -463,15 +474,15 @@ const WaterIntakeChart = () => {
         </div>
         <div className="h-4 bg-gray-800 rounded-full overflow-hidden border border-white/5">
           <div
-            className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full relative overflow-hidden animate-pulse"
+            className="h-full bg-linear-to-r from-blue-500 to-cyan-400 rounded-full relative overflow-hidden animate-pulse"
             style={{ width: `${percentage}%` }}
           >
-             <div className="absolute top-0 left-0 w-full h-full bg-linear-to-r from-transparent via-white/20 to-transparent animate-shimmer"></div>
+            <div className="absolute top-0 left-0 w-full h-full bg-linear-to-r from-transparent via-white/20 to-transparent animate-shimmer"></div>
           </div>
         </div>
       </div>
 
-      <div className="h-48 min-h-48 flex-grow">
+      <div className="h-48 min-h-48 grow">
         <ResponsiveContainer width="100%" height="100%" minHeight={192}>
           <BarChart data={waterData}>
             <CartesianGrid
@@ -499,7 +510,7 @@ const WaterIntakeChart = () => {
                 borderColor: "#27272a",
                 color: "#fff",
                 borderRadius: "12px",
-                boxShadow: "0 10px 30px rgba(0,0,0,0.5)"
+                boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
               }}
               formatter={(value) => [`${value}ml`, "Amount"]}
             />
@@ -527,15 +538,21 @@ const WaterIntakeChart = () => {
 
       <div className="mt-4 grid grid-cols-3 gap-2 text-center">
         <div className="p-2 rounded-xl bg-blue-500/5 border border-blue-500/10">
-          <div className="text-[10px] text-blue-400 uppercase tracking-wider mb-1">Morning</div>
+          <div className="text-[10px] text-blue-400 uppercase tracking-wider mb-1">
+            Morning
+          </div>
           <div className="text-sm font-bold text-white">750ml</div>
         </div>
         <div className="p-2 rounded-xl bg-cyan-500/5 border border-cyan-500/10">
-          <div className="text-[10px] text-cyan-400 uppercase tracking-wider mb-1">Afternoon</div>
+          <div className="text-[10px] text-cyan-400 uppercase tracking-wider mb-1">
+            Afternoon
+          </div>
           <div className="text-sm font-bold text-white">850ml</div>
         </div>
         <div className="p-2 rounded-xl bg-blue-500/5 border border-blue-500/10">
-          <div className="text-[10px] text-blue-400 uppercase tracking-wider mb-1">Evening</div>
+          <div className="text-[10px] text-blue-400 uppercase tracking-wider mb-1">
+            Evening
+          </div>
           <div className="text-sm font-bold text-white">500ml</div>
         </div>
       </div>
@@ -603,20 +620,25 @@ const DataTerminal = () => {
 
       const rect = element.getBoundingClientRect();
       const windowHeight = window.innerHeight;
-      
+
       // Calculate how much of the element has been scrolled through
       // 0 = element just entered viewport from bottom
       // 1 = element is fully visible (or centered)
       const start = windowHeight * 0.8; // Start animating when it's 20% up the screen
       const end = windowHeight * 0.2; // Finish when it's near the top
-      
+
       // Map position to 0-1 range
-      const progress = Math.max(0, Math.min(1, (start - rect.top) / (start - end)));
-      
+      const progress = Math.max(
+        0,
+        Math.min(1, (start - rect.top) / (start - end))
+      );
+
       const totalLines = terminalOutput.length;
       const linesToShow = Math.floor(progress * totalLines);
-      
-      const newVisibleLines = terminalOutput.slice(0, linesToShow).map(line => line.id);
+
+      const newVisibleLines = terminalOutput
+        .slice(0, linesToShow)
+        .map((line) => line.id);
       setVisibleLines(newVisibleLines);
     };
 
@@ -644,7 +666,10 @@ const DataTerminal = () => {
   };
 
   return (
-    <div id="data-terminal" className="bg-[#0a0a0a] border border-fuchsia-500/20 rounded-3xl overflow-hidden h-full flex flex-col shadow-[0_0_50px_rgba(217,70,239,0.15)] hover:border-fuchsia-500/50 transition-colors duration-500">
+    <div
+      id="data-terminal"
+      className="bg-[#0a0a0a] border border-fuchsia-500/20 rounded-3xl overflow-hidden h-full flex flex-col shadow-[0_0_50px_rgba(217,70,239,0.15)] hover:border-fuchsia-500/50 transition-colors duration-500"
+    >
       {/* Terminal Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-fuchsia-500/20 bg-[#121214]">
         <div className="flex items-center gap-3">
@@ -654,8 +679,8 @@ const DataTerminal = () => {
             <div className="w-3 h-3 rounded-full bg-green-500/50 hover:bg-green-500 transition-colors"></div>
           </div>
           <span className="text-xs font-mono text-gray-500 flex items-center gap-1">
-             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-             terminal
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+            terminal
           </span>
         </div>
         <div className="text-xs text-gray-600 font-mono hidden sm:block">
@@ -664,7 +689,7 @@ const DataTerminal = () => {
       </div>
 
       {/* Terminal Content */}
-      <div className="p-6 font-mono font-sm flex-grow overflow-hidden relative">
+      <div className="p-6 font-mono font-sm grow overflow-hidden relative">
         <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-[#0a0a0a]/50 pointer-events-none z-10"></div>
         <div className="space-y-3">
           {terminalOutput.map((line) => (
@@ -958,13 +983,15 @@ const Counter = ({ end, duration = 2000, label, sub, grad, border }) => {
   return (
     <div
       ref={ref}
-      className={`p-8 rounded-2xl bg-gradient-to-br ${grad} border ${border} hover:-translate-y-2 transition-all duration-500 hover:shadow-2xl hover:shadow-orange-500/10 bg-black/40 backdrop-blur-sm group`}
+      className={`p-8 rounded-2xl bg-linear-to-br ${grad} border ${border} hover:-translate-y-2 transition-all duration-500 hover:shadow-2xl hover:shadow-orange-500/10 bg-black/40 backdrop-blur-sm group`}
     >
       <h3 className="text-5xl font-extrabold text-white mb-2 tracking-tight group-hover:scale-105 transition-transform origin-left">
         {formatNumber(count)}
       </h3>
       <p className="font-bold text-gray-200 mb-3 text-lg">{label}</p>
-      <p className="text-sm text-gray-400 leading-relaxed group-hover:text-gray-300 transition-colors">{sub}</p>
+      <p className="text-sm text-gray-400 leading-relaxed group-hover:text-gray-300 transition-colors">
+        {sub}
+      </p>
     </div>
   );
 };
@@ -1006,12 +1033,12 @@ const FAQSection = () => {
 
   return (
     <section className="py-24 px-6 relative" id="faq">
-      <div className="absolute inset-0 bg-gradient-to-b from-[#020617] to-indigo-950/20 pointer-events-none"></div>
+      <div className="absolute inset-0 bg-linear-to-b from-[#020617] to-indigo-950/20 pointer-events-none"></div>
       <div className="max-w-4xl mx-auto relative z-10">
         <FadeInSection>
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold mb-4">
-              <span className="bg-gradient-to-r from-cyan-200 via-blue-200 to-indigo-300 bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-cyan-200 via-blue-200 to-indigo-300 bg-clip-text text-transparent">
                 Frequently Asked Questions
               </span>
             </h2>
@@ -1074,7 +1101,6 @@ const FAQSection = () => {
             </FadeInSection>
           ))}
         </div>
-
       </div>
     </section>
   );
@@ -1133,7 +1159,7 @@ const LandingPage = () => {
 
   const handleSubscribe = async () => {
     if (!newsletterEmail) return;
-    
+
     try {
       // Use existing API base URL logic or default
       const API_BASE_URL = import.meta.env.VITE_API_URL
@@ -1141,7 +1167,7 @@ const LandingPage = () => {
         : "http://localhost:8000/api";
 
       const response = await axios.post(`${API_BASE_URL}/newsletter`, {
-        email: newsletterEmail
+        email: newsletterEmail,
       });
 
       if (response.data.success) {
@@ -1213,9 +1239,9 @@ const LandingPage = () => {
   };
   return (
     <div className="min-h-screen bg-[#020617] text-white selection:bg-cyan-500/30 font-sans overflow-x-hidden relative">
-      <div className="fixed inset-0 bg-gradient-to-b from-indigo-950/20 via-[#020617] to-[#020617] -z-50 pointer-events-none"></div>
+      <div className="fixed inset-0 bg-linear-to-b from-indigo-950/20 via-[#020617] to-[#020617] -z-50 pointer-events-none"></div>
       {/* Navbar */}
-      <nav className="fixed top-0 w-full z-50 bg-[#020617]/80 backdrop-blur-xl border-b border-white/5 transition-all duration-300 supports-[backdrop-filter]:bg-[#020617]/60">
+      <nav className="fixed top-0 w-full z-50 bg-[#020617]/80 backdrop-blur-xl border-b border-white/5 transition-all duration-300 supports-backdrop-filter:bg-[#020617]/60">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div
             className="flex items-center gap-2 cursor-pointer group"
@@ -1232,7 +1258,7 @@ const LandingPage = () => {
                 size={28}
               />
             </div>
-            <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-cyan-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent group-hover:opacity-80 transition-opacity">
+            <span className="text-xl font-bold tracking-tight bg-linear-to-r from-cyan-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent group-hover:opacity-80 transition-opacity">
               Holistic Wellness Monitor
             </span>
           </div>
@@ -1265,13 +1291,17 @@ const LandingPage = () => {
                 }`}
               >
                 <div
-                  className={`absolute inset-0 bg-gradient-to-r from-orange-500/20 to-orange-600/10 transition-opacity duration-300 ${
-                    activeNav === item.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                  className={`absolute inset-0 bg-linear-to-r from-orange-500/20 to-orange-600/10 transition-opacity duration-300 ${
+                    activeNav === item.id
+                      ? "opacity-100"
+                      : "opacity-0 group-hover:opacity-100"
                   }`}
                 />
-                 <div
+                <div
                   className={`absolute inset-0 border border-orange-500/30 rounded-full transition-opacity duration-300 ${
-                    activeNav === item.id ? "opacity-100 shadow-[0_0_15px_rgba(249,115,22,0.3)]" : "opacity-0 group-hover:opacity-50"
+                    activeNav === item.id
+                      ? "opacity-100 shadow-[0_0_15px_rgba(249,115,22,0.3)]"
+                      : "opacity-0 group-hover:opacity-50"
                   }`}
                 />
                 <span className="relative z-10">{item.label}</span>
@@ -1297,23 +1327,28 @@ const LandingPage = () => {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
             </span>
-            <span className="text-xs font-bold text-indigo-200 tracking-wide uppercase">v2.0 Now Live</span>
+            <span className="text-xs font-bold text-indigo-200 tracking-wide uppercase">
+              v2.0 Now Live
+            </span>
           </div>
-          
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 bg-gradient-to-r from-white via-cyan-100 to-indigo-200 bg-clip-text text-transparent min-h-[140px] flex items-center justify-center filter drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]">
+
+          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 bg-linear-to-r from-white via-cyan-100 to-indigo-200 bg-clip-text text-transparent min-h-[140px] flex items-center justify-center filter drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]">
             <AnimatedText text="Health That Speaks Through Visuals" />
           </h1>
-          
+
           <p className="text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed animate-fade-in-up opacity-0 animation-delay-2000 font-light">
             Track every heartbeat, step, sleep, and vital sign with real-time
             insights—all in one intuitive dashboard.
           </p>
-          
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up opacity-0" style={{ animationDelay: '0.4s' }}>
-             <Button
+
+          <div
+            className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up opacity-0"
+            style={{ animationDelay: "0.4s" }}
+          >
+            <Button
               size="lg"
               onClick={handleGetStarted}
-              className="w-full sm:w-auto text-lg bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 shadow-[0_0_30px_rgba(6,182,212,0.4)] hover:shadow-[0_0_50px_rgba(6,182,212,0.6)] hover:-translate-y-1 transition-all duration-300 border-0"
+              className="w-full sm:w-auto text-lg bg-linear-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 shadow-[0_0_30px_rgba(6,182,212,0.4)] hover:shadow-[0_0_50px_rgba(6,182,212,0.6)] hover:-translate-y-1 transition-all duration-300 border-0"
             >
               Start Monitoring Free
             </Button>
@@ -1333,14 +1368,17 @@ const LandingPage = () => {
       <section className="py-24 px-6 relative" id="features">
         <div className="absolute inset-0 bg-[#08080a] opacity-80 z-0"></div>
         <div className="absolute top-0 right-0 w-1/3 h-full bg-linear-to-l from-orange-500/5 to-transparent pointer-events-none"></div>
-        
+
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold mb-4">
-              <span className="bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">Power in Your Hands</span>
+              <span className="bg-linear-to-r from-white to-gray-500 bg-clip-text text-transparent">
+                Power in Your Hands
+              </span>
             </h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
-              Advanced visualization tools designed to help you understand your body better.
+              Advanced visualization tools designed to help you understand your
+              body better.
             </p>
           </div>
 
@@ -1368,7 +1406,7 @@ const LandingPage = () => {
             <div className="lg:col-span-4 space-y-6">
               <FadeInSection delay={400}>
                 <div className="hover:scale-[1.02] transition-transform duration-500">
-                   <WaterIntakeChart />
+                  <WaterIntakeChart />
                 </div>
               </FadeInSection>
             </div>
@@ -1383,7 +1421,9 @@ const LandingPage = () => {
           <FadeInSection>
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-5xl font-bold mb-4">
-               <span className="bg-gradient-to-r from-cyan-200 via-indigo-300 to-purple-300 bg-clip-text text-transparent">Numbers That Matter</span>
+                <span className="bg-linear-to-r from-cyan-200 via-indigo-300 to-purple-300 bg-clip-text text-transparent">
+                  Numbers That Matter
+                </span>
               </h2>
               <p className="text-gray-400">
                 Real data from our community of health-conscious users.
@@ -1434,11 +1474,13 @@ const LandingPage = () => {
 
       {/* Testimonials */}
       <section className="py-24 border-b border-white/5 relative overflow-hidden">
-         <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+        <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-white/10 to-transparent"></div>
         <div className="max-w-7xl mx-auto px-6 mb-16">
           <FadeInSection>
             <h2 className="text-3xl md:text-5xl font-bold text-center">
-              <span className="bg-gradient-to-r from-orange-200 via-rose-200 to-pink-300 bg-clip-text text-transparent">Community Trust</span>
+              <span className="bg-linear-to-r from-orange-200 via-rose-200 to-pink-300 bg-clip-text text-transparent">
+                Community Trust
+              </span>
             </h2>
           </FadeInSection>
         </div>
@@ -1446,130 +1488,160 @@ const LandingPage = () => {
         {/* Infinite Scroll Container */}
         <div className="relative w-full overflow-hidden">
           {/* Gradients for fading edges */}
-          <div className="absolute left-0 top-0 bottom-0 w-12 md:w-32 bg-gradient-to-r from-[#050505] to-transparent z-10 pointer-events-none"></div>
-          <div className="absolute right-0 top-0 bottom-0 w-12 md:w-32 bg-gradient-to-l from-[#050505] to-transparent z-10 pointer-events-none"></div>
-          
-          <div className="flex animate-infinite-scroll w-max gap-8 hover:[animation-play-state:paused] py-4">
-             {/* Original Set */}
-             {[
-                {
-                  rating: "4.8",
-                  text: "This app revolutionized how I track my health. The visual insights are stunning and easy to understand.",
-                  author: "Sara Ghosh.",
-                  role: "Yoga Instructor",
-                  color: "bg-orange-500",
-                },
-                {
-                   rating: "4.5",
-                   text: "Finally, a wellness monitor that looks as good as it functions. The dark mode is perfect for night checking.",
-                   author: "Monish Raj",
-                   role: "Tech Professional",
-                   color: "bg-blue-500",
-                },
-                 {
-                   rating: "4.7",
-                   text: "Data security was my main concern, but HWM's transparent privacy policies put me at ease.",
-                   author: "Ashok Kumar.",
-                   role: "Physician",
-                   color: "bg-green-500",
-                },
-                 {
-                  rating: "4.9",
-                  text: "The hydration tracker is a game changer. I've never been this consistent with my water intake.",
-                  author: "Sivan Singh.",
-                  role: "Athlete",
-                   color: "bg-cyan-500",
-                },
-             ].map((item, i) => (
-                <div key={`original-${i}`} className="w-[350px] md:w-[400px] shrink-0">
-                   <div className="p-8 rounded-3xl bg-indigo-950/20 backdrop-blur-md border border-indigo-500/10 h-full flex flex-col justify-between hover:border-indigo-500/30 transition-colors duration-500 group hover:shadow-[0_0_20px_rgba(99,102,241,0.1)]">
-                      <div>
-                        <div className="flex justify-between items-start mb-6">
-                           <div className="text-4xl font-bold text-white">{item.rating}</div>
-                           <div className="flex gap-1 text-orange-500">
-                              {[1, 2, 3, 4, 5].map((star) => (
-                                <Star key={star} fill="currentColor" size={16} />
-                              ))}
-                           </div>
-                        </div>
-                        <p className="text-gray-400 leading-relaxed mb-6 italic">"{item.text}"</p>
-                      </div>
-                      <div className="flex items-center gap-4 pt-6 border-t border-white/5">
-                         <div className={`w-10 h-10 rounded-full ${item.color}/20 flex items-center justify-center text-${item.color.split('-')[1]}-500 font-bold`}>
-                            {item.author.charAt(0)}
-                         </div>
-                         <div>
-                            <div className="text-white font-medium">{item.author}</div>
-                            <div className="text-xs text-gray-500">{item.role}</div>
-                         </div>
-                      </div>
-                   </div>
-                </div>
-             ))}
+          <div className="absolute left-0 top-0 bottom-0 w-12 md:w-32 bg-linear-to-r from-[#050505] to-transparent z-10 pointer-events-none"></div>
+          <div className="absolute right-0 top-0 bottom-0 w-12 md:w-32 bg-linear-to-l from-[#050505] to-transparent z-10 pointer-events-none"></div>
 
-             {/* Duplicate Set for Seamless Loop */}
-             {[
-                {
-                  rating: "4.8",
-                  text: "This app revolutionized how I track my health. The visual insights are stunning and easy to understand.",
-                  author: "Sarah J.",
-                  role: "Yoga Instructor",
-                   color: "bg-orange-500",
-                },
-                {
-                   rating: "4.9",
-                   text: "Finally, a wellness monitor that looks as good as it functions. The dark mode is perfect for night checking.",
-                   author: "Michael C.",
-                   role: "Tech Professional",
-                    color: "bg-blue-500",
-                },
-                 {
-                   rating: "4.7",
-                   text: "Data security was my main concern, but HWM's transparent privacy policies put me at ease.",
-                   author: "Dr. Emily R.",
-                   role: "Physician",
-                    color: "bg-green-500",
-                },
-                 {
-                  rating: "4.9",
-                  text: "The hydration tracker is a game changer. I've never been this consistent with my water intake.",
-                  author: "David K.",
-                  role: "Athlete",
-                   color: "bg-cyan-500",
-                },
-             ].map((item, i) => (
-                <div key={`duplicate-${i}`} className="w-[350px] md:w-[400px] shrink-0">
-                   <div className="p-8 rounded-3xl bg-indigo-950/20 backdrop-blur-md border border-indigo-500/10 h-full flex flex-col justify-between hover:border-indigo-500/30 transition-colors duration-500 group hover:shadow-[0_0_20px_rgba(99,102,241,0.1)]">
-                      <div>
-                        <div className="flex justify-between items-start mb-6">
-                           <div className="text-4xl font-bold text-white">{item.rating}</div>
-                           <div className="flex gap-1 text-orange-500">
-                              {[1, 2, 3, 4, 5].map((star) => (
-                                <Star key={star} fill="currentColor" size={16} />
-                              ))}
-                           </div>
-                        </div>
-                        <p className="text-gray-400 leading-relaxed mb-6 italic">"{item.text}"</p>
+          <div className="flex animate-infinite-scroll w-max gap-8 hover:[animation-play-state:paused] py-4">
+            {/* Original Set */}
+            {[
+              {
+                rating: "4.8",
+                text: "This app revolutionized how I track my health. The visual insights are stunning and easy to understand.",
+                author: "Sara Ghosh.",
+                role: "Yoga Instructor",
+                color: "bg-orange-500",
+              },
+              {
+                rating: "4.5",
+                text: "Finally, a wellness monitor that looks as good as it functions. The dark mode is perfect for night checking.",
+                author: "Monish Raj",
+                role: "Tech Professional",
+                color: "bg-blue-500",
+              },
+              {
+                rating: "4.7",
+                text: "Data security was my main concern, but HWM's transparent privacy policies put me at ease.",
+                author: "Ashok Kumar.",
+                role: "Physician",
+                color: "bg-green-500",
+              },
+              {
+                rating: "4.9",
+                text: "The hydration tracker is a game changer. I've never been this consistent with my water intake.",
+                author: "Sivan Singh.",
+                role: "Athlete",
+                color: "bg-cyan-500",
+              },
+            ].map((item, i) => (
+              <div
+                key={`original-${i}`}
+                className="w-[350px] md:w-[400px] shrink-0"
+              >
+                <div className="p-8 rounded-3xl bg-indigo-950/20 backdrop-blur-md border border-indigo-500/10 h-full flex flex-col justify-between hover:border-indigo-500/30 transition-colors duration-500 group hover:shadow-[0_0_20px_rgba(99,102,241,0.1)]">
+                  <div>
+                    <div className="flex justify-between items-start mb-6">
+                      <div className="text-4xl font-bold text-white">
+                        {item.rating}
                       </div>
-                      <div className="flex items-center gap-4 pt-6 border-t border-white/5">
-                         <div className={`w-10 h-10 rounded-full ${item.color}/20 flex items-center justify-center text-${item.color.split('-')[1]}-500 font-bold`}>
-                            {item.author.charAt(0)}
-                         </div>
-                         <div>
-                            <div className="text-white font-medium">{item.author}</div>
-                            <div className="text-xs text-gray-500">{item.role}</div>
-                         </div>
+                      <div className="flex gap-1 text-orange-500">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star key={star} fill="currentColor" size={16} />
+                        ))}
                       </div>
-                   </div>
+                    </div>
+                    <p className="text-gray-400 leading-relaxed mb-6 italic">
+                      "{item.text}"
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-4 pt-6 border-t border-white/5">
+                    <div
+                      className={`w-10 h-10 rounded-full ${
+                        item.color
+                      }/20 flex items-center justify-center text-${
+                        item.color.split("-")[1]
+                      }-500 font-bold`}
+                    >
+                      {item.author.charAt(0)}
+                    </div>
+                    <div>
+                      <div className="text-white font-medium">
+                        {item.author}
+                      </div>
+                      <div className="text-xs text-gray-500">{item.role}</div>
+                    </div>
+                  </div>
                 </div>
-             ))}
+              </div>
+            ))}
+
+            {/* Duplicate Set for Seamless Loop */}
+            {[
+              {
+                rating: "4.8",
+                text: "This app revolutionized how I track my health. The visual insights are stunning and easy to understand.",
+                author: "Sarah J.",
+                role: "Yoga Instructor",
+                color: "bg-orange-500",
+              },
+              {
+                rating: "4.9",
+                text: "Finally, a wellness monitor that looks as good as it functions. The dark mode is perfect for night checking.",
+                author: "Michael C.",
+                role: "Tech Professional",
+                color: "bg-blue-500",
+              },
+              {
+                rating: "4.7",
+                text: "Data security was my main concern, but HWM's transparent privacy policies put me at ease.",
+                author: "Dr. Emily R.",
+                role: "Physician",
+                color: "bg-green-500",
+              },
+              {
+                rating: "4.9",
+                text: "The hydration tracker is a game changer. I've never been this consistent with my water intake.",
+                author: "David K.",
+                role: "Athlete",
+                color: "bg-cyan-500",
+              },
+            ].map((item, i) => (
+              <div
+                key={`duplicate-${i}`}
+                className="w-[350px] md:w-[400px] shrink-0"
+              >
+                <div className="p-8 rounded-3xl bg-indigo-950/20 backdrop-blur-md border border-indigo-500/10 h-full flex flex-col justify-between hover:border-indigo-500/30 transition-colors duration-500 group hover:shadow-[0_0_20px_rgba(99,102,241,0.1)]">
+                  <div>
+                    <div className="flex justify-between items-start mb-6">
+                      <div className="text-4xl font-bold text-white">
+                        {item.rating}
+                      </div>
+                      <div className="flex gap-1 text-orange-500">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star key={star} fill="currentColor" size={16} />
+                        ))}
+                      </div>
+                    </div>
+                    <p className="text-gray-400 leading-relaxed mb-6 italic">
+                      "{item.text}"
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-4 pt-6 border-t border-white/5">
+                    <div
+                      className={`w-10 h-10 rounded-full ${
+                        item.color
+                      }/20 flex items-center justify-center text-${
+                        item.color.split("-")[1]
+                      }-500 font-bold`}
+                    >
+                      {item.author.charAt(0)}
+                    </div>
+                    <div>
+                      <div className="text-white font-medium">
+                        {item.author}
+                      </div>
+                      <div className="text-xs text-gray-500">{item.role}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* FAQ Section */}
       <FAQSection />
-      
+
       <section className="py-24 px-6 relative overflow-hidden" id="contact">
         {/* Background glow */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-orange-500/10 blur-[100px] rounded-full pointer-events-none animate-pulse"></div>
@@ -1586,13 +1658,13 @@ const LandingPage = () => {
                     className="w-full h-64 object-cover rounded-2xl group-hover:scale-110 transition-transform duration-700"
                   />
                 </div>
-                <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+                <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-linear-to-r from-white to-gray-400 bg-clip-text text-transparent">
                   Let's get you <br />
                   started
                 </h2>
                 <p className="text-gray-400 mb-6">
-                  Join thousands of users who transformed their health journey with
-                  visual insights.
+                  Join thousands of users who transformed their health journey
+                  with visual insights.
                 </p>
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 text-sm text-gray-300">
@@ -1662,9 +1734,16 @@ const LandingPage = () => {
                     )}
 
                     <div className="flex items-center justify-between pt-2">
-                       <Button type="submit" disabled={isSubmitting} className="w-full justify-center shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40">
+                      <Button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="w-full justify-center shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40"
+                      >
                         {isSubmitting ? "Sending..." : "Send Message"}{" "}
-                        <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                        <ArrowRight
+                          size={16}
+                          className="ml-2 group-hover:translate-x-1 transition-transform"
+                        />
                       </Button>
                     </div>
                   </form>
@@ -1675,19 +1754,17 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      {/* Footer */}
       <footer className="py-12 px-6 border-t border-white/5 bg-[#020617] relative overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-px bg-linear-to-r from-transparent via-white/10 to-transparent"></div>
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12 mb-12">
             {/* Brand Column */}
             <div className="lg:col-span-2 space-y-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-gradient-to-br from-orange-500/20 to-orange-600/10 rounded-xl border border-orange-500/20">
+                <div className="p-2 bg-linear-to-br from-orange-500/20 to-orange-600/10 rounded-xl border border-orange-500/20">
                   <Activity className="text-orange-500" size={24} />
                 </div>
-                <span className="text-2xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+                <span className="text-2xl font-bold bg-linear-to-r from-white to-gray-400 bg-clip-text text-transparent">
                   Holistic Wellness Monitor
                 </span>
               </div>
@@ -1697,9 +1774,24 @@ const LandingPage = () => {
               </p>
               <div className="flex items-center gap-4">
                 {[
-                  { icon: Linkedin, href: "https://linkedin.com/in/soumyosishpal", color: "hover:text-blue-400 hover:bg-blue-500/10 hover:border-blue-500/20" },
-                  { icon: Github, href: "https://github.com/Soumyosish", color: "hover:text-white hover:bg-white/10 hover:border-white/20" },
-                  { icon: Mail, href: "mailto:support@holisticwellness.com", color: "hover:text-orange-400 hover:bg-orange-500/10 hover:border-orange-500/20" }
+                  {
+                    icon: Linkedin,
+                    href: "https://linkedin.com/in/soumyosishpal",
+                    color:
+                      "hover:text-blue-400 hover:bg-blue-500/10 hover:border-blue-500/20",
+                  },
+                  {
+                    icon: Github,
+                    href: "https://github.com/Soumyosish",
+                    color:
+                      "hover:text-white hover:bg-white/10 hover:border-white/20",
+                  },
+                  {
+                    icon: Mail,
+                    href: "mailto:support@holisticwellness.com",
+                    color:
+                      "hover:text-orange-400 hover:bg-orange-500/10 hover:border-orange-500/20",
+                  },
                 ].map((social, i) => (
                   <a
                     key={i}
@@ -1708,7 +1800,10 @@ const LandingPage = () => {
                     rel="noopener noreferrer"
                     className={`w-10 h-10 rounded-full bg-white/5 border border-white/5 flex items-center justify-center transition-all duration-300 hover:scale-110 ${social.color}`}
                   >
-                    <social.icon size={18} className="text-gray-400 transition-colors" />
+                    <social.icon
+                      size={18}
+                      className="text-gray-400 transition-colors"
+                    />
                   </a>
                 ))}
               </div>
@@ -1716,13 +1811,34 @@ const LandingPage = () => {
 
             {/* Quick Links */}
             <div>
-              <h4 className="text-white font-bold mb-6 text-lg tracking-tight">Quick Links</h4>
+              <h4 className="text-white font-bold mb-6 text-lg tracking-tight">
+                Quick Links
+              </h4>
               <ul className="space-y-4">
                 {[
-                  { label: "Home", icon: Home, action: () => scrollToSection("home") },
-                  { label: "Dashboard", icon: LayoutDashboard, action: () => { navigate("/dashboard"); window.scrollTo({ top: 0, behavior: "smooth" }); } },
-                  { label: "FAQ", icon: HelpCircle, action: () => scrollToSection("faq") },
-                  { label: "Contact", icon: Mail, action: () => scrollToSection("contact") }
+                  {
+                    label: "Home",
+                    icon: Home,
+                    action: () => scrollToSection("home"),
+                  },
+                  {
+                    label: "Dashboard",
+                    icon: LayoutDashboard,
+                    action: () => {
+                      navigate("/dashboard");
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    },
+                  },
+                  {
+                    label: "FAQ",
+                    icon: HelpCircle,
+                    action: () => scrollToSection("faq"),
+                  },
+                  {
+                    label: "Contact",
+                    icon: Mail,
+                    action: () => scrollToSection("contact"),
+                  },
                 ].map((link, i) => (
                   <li key={i}>
                     <button
@@ -1730,7 +1846,9 @@ const LandingPage = () => {
                       className="text-gray-400 hover:text-white transition-all duration-300 text-sm flex items-center gap-3 group"
                     >
                       <span className="w-1.5 h-1.5 rounded-full bg-orange-500/0 group-hover:bg-orange-500 transition-all duration-300"></span>
-                      <span className="group-hover:translate-x-1 transition-transform">{link.label}</span>
+                      <span className="group-hover:translate-x-1 transition-transform">
+                        {link.label}
+                      </span>
                     </button>
                   </li>
                 ))}
@@ -1739,13 +1857,25 @@ const LandingPage = () => {
 
             {/* Legal Links */}
             <div>
-              <h4 className="text-white font-bold mb-6 text-lg tracking-tight">Legal</h4>
+              <h4 className="text-white font-bold mb-6 text-lg tracking-tight">
+                Legal
+              </h4>
               <ul className="space-y-4">
-                {["Privacy Policy", "Terms of Service", "Cookie Policy", "Disclaimer"].map((item, i) => (
+                {[
+                  "Privacy Policy",
+                  "Terms of Service",
+                  "Cookie Policy",
+                  "Disclaimer",
+                ].map((item, i) => (
                   <li key={i}>
-                    <a href="#" className="text-gray-400 hover:text-white transition-all duration-300 text-sm group flex items-center gap-2">
-                       <span className="w-1.5 h-1.5 rounded-full bg-orange-500/0 group-hover:bg-orange-500 transition-all duration-300"></span>
-                       <span className="group-hover:translate-x-1 transition-transform">{item}</span>
+                    <a
+                      href="#"
+                      className="text-gray-400 hover:text-white transition-all duration-300 text-sm group flex items-center gap-2"
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-orange-500/0 group-hover:bg-orange-500 transition-all duration-300"></span>
+                      <span className="group-hover:translate-x-1 transition-transform">
+                        {item}
+                      </span>
                     </a>
                   </li>
                 ))}
@@ -1754,31 +1884,42 @@ const LandingPage = () => {
 
             {/* Newsletter */}
             <div>
-              <h4 className="text-white font-bold mb-6 text-lg tracking-tight">Stay Updated</h4>
+              <h4 className="text-white font-bold mb-6 text-lg tracking-tight">
+                Stay Updated
+              </h4>
               <p className="text-gray-400 text-xs mb-4">
-                Subscribe to our newsletter for the latest health tips and feature updates.
+                Subscribe to our newsletter for the latest health tips and
+                feature updates.
               </p>
               <div className="relative group">
-                 <input 
-                    type="email" 
-                    placeholder="Enter email"
-                    value={newsletterEmail}
-                    onChange={(e) => setNewsletterEmail(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-sm focus:border-orange-500 focus:bg-white/10 focus:outline-none transition-all text-white placeholder-gray-600 pr-10"
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        handleSubscribe();
-                      }
-                    }}
-                 />
-                 <button 
+                <input
+                  type="email"
+                  placeholder="Enter email"
+                  value={newsletterEmail}
+                  onChange={(e) => setNewsletterEmail(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-sm focus:border-orange-500 focus:bg-white/10 focus:outline-none transition-all text-white placeholder-gray-600 pr-10"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleSubscribe();
+                    }
+                  }}
+                />
+                <button
                   onClick={handleSubscribe}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-orange-500 rounded-lg text-white opacity-0 group-focus-within:opacity-100 transition-all hover:bg-orange-600">
-                    <ArrowRight size={14} />
-                 </button>
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-orange-500 rounded-lg text-white opacity-0 group-focus-within:opacity-100 transition-all hover:bg-orange-600"
+                >
+                  <ArrowRight size={14} />
+                </button>
               </div>
               {newsletterStatus && (
-                <div className={`text-xs mt-2 ${newsletterStatus.includes("success") || newsletterStatus.includes("subscribed") ? "text-green-500" : "text-red-500"}`}>
+                <div
+                  className={`text-xs mt-2 ${
+                    newsletterStatus.includes("success") ||
+                    newsletterStatus.includes("subscribed")
+                      ? "text-green-500"
+                      : "text-red-500"
+                  }`}
+                >
                   {newsletterStatus}
                 </div>
               )}
@@ -1787,11 +1928,15 @@ const LandingPage = () => {
 
           <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-gray-500 text-sm text-center md:text-left">
-              &copy; {new Date().getFullYear()} Holistic Wellness Monitor. All rights reserved.
+              &copy; {new Date().getFullYear()} Holistic Wellness Monitor. All
+              rights reserved.
             </p>
             <div className="flex items-center gap-1.5 text-sm text-gray-500 bg-white/5 px-4 py-2 rounded-full border border-white/5">
               <span>Made with</span>
-              <Heart size={14} className="text-red-500 fill-red-500 animate-pulse" />
+              <Heart
+                size={14}
+                className="text-red-500 fill-red-500 animate-pulse"
+              />
               <span>by Soumyosish Pal</span>
             </div>
           </div>

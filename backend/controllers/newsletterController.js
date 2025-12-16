@@ -31,7 +31,9 @@ export const subscribe = async (req, res) => {
       `,
     });
 
-    res.status(200).json({ success: true, message: "You have been subscribed" });
+    res
+      .status(200)
+      .json({ success: true, message: "You have been subscribed" });
   } catch (error) {
     console.error("Newsletter subscription error:", error);
     res.status(500).json({ msg: "Server error during subscription" });

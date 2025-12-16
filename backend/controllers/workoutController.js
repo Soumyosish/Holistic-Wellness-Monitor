@@ -2,7 +2,7 @@ import Workout from "../models/Workout.js";
 import Exercise from "../models/Exercise.js";
 import DailySummary from "../models/DailySummary.js";
 
-// --- EXERCISE LIBRARY ---
+
 
 export const getExercises = async (req, res) => {
   try {
