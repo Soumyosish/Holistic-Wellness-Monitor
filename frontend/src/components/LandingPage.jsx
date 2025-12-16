@@ -43,6 +43,8 @@ import {
   Globe,
   Linkedin,
   Github,
+  MessageSquare,
+  AlertCircle,
 } from "lucide-react";
 import {
   LineChart,
@@ -58,6 +60,59 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
+
+const useScrollAnimation = () => {
+  const elementRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    if (elementRef.current) {
+      observer.observe(elementRef.current);
+    }
+
+    return () => {
+      if (elementRef.current) {
+        observer.unobserve(elementRef.current);
+      }
+    };
+  }, []);
+
+  return [elementRef, isVisible];
+};
+
+const Blob = ({ className }) => (
+  <div
+    className={`absolute rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob ${className}`}
+  ></div>
+);
+
+const FadeInSection = ({ children, delay = 0, className = "" }) => {
+  const [ref, isVisible] = useScrollAnimation();
+  return (
+    <div
+      ref={ref}
+      className={`transition-all duration-1000 transform ${
+        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"
+      } ${className}`}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
+      {children}
+    </div>
+  );
+};
+
 const Button = ({
   children,
   variant = "primary",
@@ -114,16 +169,18 @@ const BMICalculator = () => {
   const bmiStatus = getBmiStatus(bmi);
 
   return (
-    <div className="bg-[#121214] border border-white/5 rounded-3xl p-6">
+    <div className="bg-emerald-950/20 backdrop-blur-xl border border-emerald-500/20 rounded-3xl p-6 h-full flex flex-col justify-between hover:border-emerald-500/50 transition-colors duration-500 hover:shadow-[0_0_30px_rgba(16,185,129,0.1)]">
       <div className="flex items-center gap-2 mb-6">
-        <Scale className="text-blue-500" size={20} />
+        <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+           <Scale className="text-emerald-500" size={20} />
+        </div>
         <h3 className="text-lg font-bold text-white">BMI Calculator</h3>
       </div>
 
-      <div className="grid grid-cols-2 gap-6 mb-6">
+      <div className="space-y-6 mb-6">
         <div>
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-400">HEIGHT</span>
+            <span className="text-sm text-gray-400 font-medium">HEIGHT</span>
             <span className="text-lg font-bold text-white">{height} cm</span>
           </div>
           <input
@@ -132,17 +189,13 @@ const BMICalculator = () => {
             max="220"
             value={height}
             onChange={(e) => setHeight(parseInt(e.target.value))}
-            className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-500"
+            className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-500 [&::-webkit-slider-thumb]:shadow-[0_0_10px_rgba(59,130,246,0.5)] transition-all"
           />
-          <div className="flex justify-between text-xs text-gray-500 mt-1">
-            <span>100</span>
-            <span>220 cm</span>
-          </div>
         </div>
 
         <div>
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-400">WEIGHT</span>
+            <span className="text-sm text-gray-400 font-medium">WEIGHT</span>
             <span className="text-lg font-bold text-white">{weight} kg</span>
           </div>
           <input
@@ -151,31 +204,27 @@ const BMICalculator = () => {
             max="150"
             value={weight}
             onChange={(e) => setWeight(parseInt(e.target.value))}
-            className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-green-500"
+            className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-green-500 [&::-webkit-slider-thumb]:shadow-[0_0_10px_rgba(34,197,94,0.5)] transition-all"
           />
-          <div className="flex justify-between text-xs text-gray-500 mt-1">
-            <span>30</span>
-            <span>150 kg</span>
-          </div>
         </div>
       </div>
 
-      <div className="text-center mb-6">
-        <div className="text-4xl font-bold text-white mb-1">{bmi}</div>
-        <div className={`text-sm font-medium ${bmiStatus.color}`}>
+      <div className="text-center mb-6 p-4 rounded-2xl bg-white/5 border border-white/5">
+        <div className="text-5xl font-extrabold text-white mb-1 tracking-tight">{bmi}</div>
+        <div className={`text-sm font-bold uppercase tracking-wide ${bmiStatus.color}`}>
           {bmiStatus.status}
         </div>
-        <div className="text-xs text-gray-500 mt-1">Body Mass Index (BMI)</div>
+        <div className="text-xs text-gray-500 mt-2">Body Mass Index</div>
       </div>
 
       <div className="grid grid-cols-2 gap-4 text-center">
-        <div className="p-3 rounded-xl bg-white/5">
-          <div className="text-sm text-gray-400 mb-1">Chest (in)</div>
-          <div className="text-lg font-bold text-white">44.5</div>
+        <div className="p-3 rounded-xl bg-white/5 border border-white/5">
+          <div className="text-xs text-gray-400 mb-1 uppercase tracking-wider">Chest</div>
+          <div className="text-lg font-bold text-white">44.5"</div>
         </div>
-        <div className="p-3 rounded-xl bg-white/5">
-          <div className="text-sm text-gray-400 mb-1">Waist</div>
-          <div className="text-lg font-bold text-white">34</div>
+        <div className="p-3 rounded-xl bg-white/5 border border-white/5">
+          <div className="text-xs text-gray-400 mb-1 uppercase tracking-wider">Waist</div>
+          <div className="text-lg font-bold text-white">34"</div>
         </div>
       </div>
     </div>
@@ -392,67 +441,73 @@ const WaterIntakeChart = () => {
   const percentage = Math.min(100, (totalIntake / dailyGoal) * 100);
 
   return (
-    <div className="bg-[#121214] border border-white/5 rounded-3xl p-6">
+    <div className="bg-cyan-950/20 backdrop-blur-xl border border-cyan-500/20 rounded-3xl p-6 h-full flex flex-col hover:border-cyan-500/50 transition-colors duration-500 hover:shadow-[0_0_30px_rgba(6,182,212,0.1)]">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
-          <Droplets className="text-blue-500" size={20} />
-          <h3 className="text-lg font-bold text-white">Daily Water Intake</h3>
+          <div className="p-2 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
+             <Droplets className="text-cyan-500" size={20} />
+          </div>
+          <h3 className="text-lg font-bold text-white">Hydration</h3>
         </div>
         <div className="text-right">
-          <div className="text-2xl font-bold text-white">{totalIntake}ml</div>
-          <div className="text-xs text-gray-400">of {dailyGoal}ml</div>
+          <div className="text-2xl font-bold text-white leading-none">{totalIntake}ml</div>
+          <div className="text-xs text-gray-400">Goal: {dailyGoal}ml</div>
         </div>
       </div>
 
-      <div className="mb-6">
+      <div className="mb-6 relative group cursor-pointer">
         <div className="flex justify-between text-sm mb-2">
-          <span className="text-gray-400">Progress</span>
-          <span className="text-white">{percentage.toFixed(0)}%</span>
+          <span className="text-gray-400">Daily Progress</span>
+          <span className="text-white font-bold">{percentage.toFixed(0)}%</span>
         </div>
-        <div className="h-3 bg-gray-700 rounded-full overflow-hidden">
+        <div className="h-4 bg-gray-800 rounded-full overflow-hidden border border-white/5">
           <div
-            className="h-full bg-linear-to-r from-blue-400 to-cyan-400 rounded-full"
+            className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full relative overflow-hidden animate-pulse"
             style={{ width: `${percentage}%` }}
-          ></div>
+          >
+             <div className="absolute top-0 left-0 w-full h-full bg-linear-to-r from-transparent via-white/20 to-transparent animate-shimmer"></div>
+          </div>
         </div>
       </div>
 
-      <div className="h-48 min-h-48">
+      <div className="h-48 min-h-48 flex-grow">
         <ResponsiveContainer width="100%" height="100%" minHeight={192}>
           <BarChart data={waterData}>
             <CartesianGrid
               strokeDasharray="3 3"
               vertical={false}
               stroke="#3f3f46"
-              opacity={0.3}
+              opacity={0.1}
             />
             <XAxis
               dataKey="time"
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "#a1a1aa", fontSize: 10 }}
+              tick={{ fill: "#71717a", fontSize: 10 }}
             />
             <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "#a1a1aa", fontSize: 10 }}
+              tick={{ fill: "#71717a", fontSize: 10 }}
               domain={[0, 600]}
             />
             <Tooltip
               cursor={{ fill: "rgba(255,255,255,0.05)" }}
               contentStyle={{
                 backgroundColor: "#18181b",
-                borderColor: "#3f3f46",
+                borderColor: "#27272a",
                 color: "#fff",
-                borderRadius: "8px",
+                borderRadius: "12px",
+                boxShadow: "0 10px 30px rgba(0,0,0,0.5)"
               }}
               formatter={(value) => [`${value}ml`, "Amount"]}
             />
-            <Bar dataKey="amount" radius={[4, 4, 0, 0]} fill="#0ea5e9">
+            <Bar dataKey="amount" radius={[4, 4, 0, 0]}>
               {waterData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
                   fill={entry.amount >= entry.goal ? "#0ea5e9" : "#3b82f6"}
+                  opacity={0.8}
                 />
               ))}
             </Bar>
@@ -463,22 +518,23 @@ const WaterIntakeChart = () => {
               strokeWidth={2}
               strokeDasharray="5 5"
               dot={false}
+              opacity={0.5}
             />
           </BarChart>
         </ResponsiveContainer>
       </div>
 
       <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-        <div className="p-2 rounded-lg bg-blue-500/10">
-          <div className="text-xs text-blue-400 mb-1">Morning</div>
+        <div className="p-2 rounded-xl bg-blue-500/5 border border-blue-500/10">
+          <div className="text-[10px] text-blue-400 uppercase tracking-wider mb-1">Morning</div>
           <div className="text-sm font-bold text-white">750ml</div>
         </div>
-        <div className="p-2 rounded-lg bg-cyan-500/10">
-          <div className="text-xs text-cyan-400 mb-1">Afternoon</div>
+        <div className="p-2 rounded-xl bg-cyan-500/5 border border-cyan-500/10">
+          <div className="text-[10px] text-cyan-400 uppercase tracking-wider mb-1">Afternoon</div>
           <div className="text-sm font-bold text-white">850ml</div>
         </div>
-        <div className="p-2 rounded-lg bg-blue-500/10">
-          <div className="text-xs text-blue-400 mb-1">Evening</div>
+        <div className="p-2 rounded-xl bg-blue-500/5 border border-blue-500/10">
+          <div className="text-[10px] text-blue-400 uppercase tracking-wider mb-1">Evening</div>
           <div className="text-sm font-bold text-white">500ml</div>
         </div>
       </div>
@@ -538,64 +594,87 @@ const DataTerminal = () => {
     { id: 11, command: "$", type: "cursor" },
   ]);
 
+  // Scroll-linked animation logic
   useEffect(() => {
-    const timers = [];
-    terminalOutput.forEach((line, index) => {
-      const timer = setTimeout(() => {
-        setVisibleLines((prev) => [...prev, line.id]);
-      }, index * 300); // 300ms delay between each line
-      timers.push(timer);
-    });
+    const handleScroll = () => {
+      const element = document.getElementById("data-terminal");
+      if (!element) return;
 
-    return () => timers.forEach((timer) => clearTimeout(timer));
+      const rect = element.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      
+      // Calculate how much of the element has been scrolled through
+      // 0 = element just entered viewport from bottom
+      // 1 = element is fully visible (or centered)
+      const start = windowHeight * 0.8; // Start animating when it's 20% up the screen
+      const end = windowHeight * 0.2; // Finish when it's near the top
+      
+      // Map position to 0-1 range
+      const progress = Math.max(0, Math.min(1, (start - rect.top) / (start - end)));
+      
+      const totalLines = terminalOutput.length;
+      const linesToShow = Math.floor(progress * totalLines);
+      
+      const newVisibleLines = terminalOutput.slice(0, linesToShow).map(line => line.id);
+      setVisibleLines(newVisibleLines);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    handleScroll(); // Check initial position
+
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [terminalOutput]);
 
   const getLineColor = (type) => {
     switch (type) {
       case "command":
-        return "text-green-400";
+        return "text-fuchsia-400";
       case "success":
-        return "text-green-500 font-bold";
+        return "text-emerald-400 font-bold";
       case "info":
-        return "text-blue-400";
-      case "data":
         return "text-cyan-400";
+      case "data":
+        return "text-purple-300";
       case "cursor":
-        return "text-green-400";
+        return "text-fuchsia-500";
       default:
-        return "text-gray-300";
+        return "text-gray-400";
     }
   };
 
   return (
-    <div className="bg-[#0a0a0a] border border-white/5 rounded-3xl overflow-hidden">
+    <div id="data-terminal" className="bg-[#0a0a0a] border border-fuchsia-500/20 rounded-3xl overflow-hidden h-full flex flex-col shadow-[0_0_50px_rgba(217,70,239,0.15)] hover:border-fuchsia-500/50 transition-colors duration-500">
       {/* Terminal Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-[#121214]">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-fuchsia-500/20 bg-[#121214]">
         <div className="flex items-center gap-3">
           <div className="flex gap-2">
-            <div className="w-3 h-3 rounded-full bg-red-500/50"></div>
-            <div className="w-3 h-3 rounded-full bg-yellow-500/50"></div>
-            <div className="w-3 h-3 rounded-full bg-green-500/50"></div>
+            <div className="w-3 h-3 rounded-full bg-red-500/50 hover:bg-red-500 transition-colors"></div>
+            <div className="w-3 h-3 rounded-full bg-yellow-500/50 hover:bg-yellow-500 transition-colors"></div>
+            <div className="w-3 h-3 rounded-full bg-green-500/50 hover:bg-green-500 transition-colors"></div>
           </div>
-          <span className="text-sm font-mono text-gray-400">terminal</span>
+          <span className="text-xs font-mono text-gray-500 flex items-center gap-1">
+             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+             terminal
+          </span>
         </div>
-        <div className="text-xs text-gray-500 font-mono">
-          Hollistic Wellness Monitor v2.1.4
+        <div className="text-xs text-gray-600 font-mono hidden sm:block">
+          hwm-cli v2.1.4
         </div>
       </div>
 
       {/* Terminal Content */}
-      <div className="p-6 font-mono">
-        <div className="space-y-2">
+      <div className="p-6 font-mono font-sm flex-grow overflow-hidden relative">
+        <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-[#0a0a0a]/50 pointer-events-none z-10"></div>
+        <div className="space-y-3">
           {terminalOutput.map((line) => (
             <div
               key={line.id}
               className={`${getLineColor(
                 line.type
-              )} transition-all duration-500 ${
+              )} transition-all duration-500 ease-out transform ${
                 visibleLines.includes(line.id)
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 -translate-y-2"
+                  ? "opacity-100 translate-x-0"
+                  : "opacity-0 -translate-x-4"
               }`}
               style={{
                 transitionDelay: `${line.id * 50}ms`,
@@ -607,9 +686,9 @@ const DataTerminal = () => {
                 line.command
               )}
               {line.value && (
-                <span className="ml-2 px-2 py-1 rounded text-xs bg-white/5 border border-white/5">
+                <span className="ml-2 px-2 py-0.5 rounded text-[10px] bg-white/5 border border-white/5 font-bold tracking-wider">
                   {line.value}{" "}
-                  <span className="text-gray-400">{line.unit}</span>
+                  <span className="text-gray-500 font-normal">{line.unit}</span>
                 </span>
               )}
             </div>
@@ -878,35 +957,50 @@ const Counter = ({ end, duration = 2000, label, sub, grad, border }) => {
   return (
     <div
       ref={ref}
-      className={`p-8 rounded-2xl bg-linear-to-br ${grad} border ${border} hover:translate-y-[-5px] transition-transform duration-300`}
+      className={`p-8 rounded-2xl bg-gradient-to-br ${grad} border ${border} hover:-translate-y-2 transition-all duration-500 hover:shadow-2xl hover:shadow-orange-500/10 bg-black/40 backdrop-blur-sm group`}
     >
-      <h3 className="text-4xl font-bold text-white mb-2">
+      <h3 className="text-5xl font-extrabold text-white mb-2 tracking-tight group-hover:scale-105 transition-transform origin-left">
         {formatNumber(count)}
       </h3>
-      <p className="font-semibold text-gray-200 mb-2">{label}</p>
-      <p className="text-xs text-gray-400 leading-relaxed">{sub}</p>
+      <p className="font-bold text-gray-200 mb-3 text-lg">{label}</p>
+      <p className="text-sm text-gray-400 leading-relaxed group-hover:text-gray-300 transition-colors">{sub}</p>
     </div>
   );
 };
 
 const FAQSection = () => {
-  const [openIndex, setOpenIndex] = useState(null);
+  const [openIndex, setOpenIndex] = useState(0);
 
   const faqs = [
     {
       question: "How does Holistic Wellness Monitor track my health data?",
       answer:
-        "Our platform integrates with various health devices and apps like Google Fit to collect real-time data on your steps, sleep patterns, activity levels, and more. All data is encrypted and stored securely.",
+        "Our platform integrates seamlessly with popular wearable devices like Apple Watch, Fitbit, and Garmin, as well as apps like Google Fit. It aggregates real-time data on steps, heart rate, sleep quality, and active calories to provide a unified health dashboard.",
     },
     {
-      question: "Is my health data secure and private?",
+      question: "Is my personal health data secure and private?",
       answer:
-        "Yes, we take data privacy seriously. All your health data is encrypted end-to-end, and we never share your personal information with third parties without your explicit consent.",
+        "Security is our top priority. We use military-grade AES-256 encryption for all data transmission and storage. We adhere to strict HIPAA and GDPR compliance standards, ensuring your sensitive health information is never shared with third parties without your explicit consent.",
     },
     {
-      question: "Can I share my health data with my doctor?",
+      question: "Can I generate reports to share with my doctor?",
       answer:
-        "Yes, you can easily generate and share comprehensive health reports with your healthcare provider through secure, encrypted links. You have full control over what data you share and with whom.",
+        "Absolutely. You can generate comprehensive PDF health reports with a single click. These reports include trends, vital signs history, and anomaly detection summaries, making it easy for your healthcare provider to understand your long-term health journey.",
+    },
+    {
+      question: "Is there a mobile app available?",
+      answer:
+        "Yes, Holistic Wellness Monitor is available as a fully native app for both iOS and Android. You can download it today from the App Store and Google Play Store to track your health on the go.",
+    },
+    {
+      question: "What is the difference between Free and Premium?",
+      answer:
+        "The Free plan offers basic tracking for steps, water, and sleep. Premium unlocks advanced features like deep sleep analysis, AI-powered health insights, unlimited historical data export, and personalized workout recommendations.",
+    },
+    {
+      question: "Can I export my data?",
+      answer:
+        "Yes, you have full ownership of your data. You can export your entire history in CSV, JSON, or XML formats at any time for your own backups or analysis in other tools.",
     },
   ];
 
@@ -915,63 +1009,76 @@ const FAQSection = () => {
   };
 
   return (
-    <section
-      className="py-24 px-6 bg-linear-to-b from-[#050505] to-[#0a0a0a]"
-      id="faq"
-    >
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-5xl font-bold mb-4">
-            Frequently Asked Questions
-          </h2>
-        </div>
+    <section className="py-24 px-6 relative" id="faq">
+      <div className="absolute inset-0 bg-gradient-to-b from-[#020617] to-indigo-950/20 pointer-events-none"></div>
+      <div className="max-w-4xl mx-auto relative z-10">
+        <FadeInSection>
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">
+              <span className="bg-gradient-to-r from-cyan-200 via-blue-200 to-indigo-300 bg-clip-text text-transparent">
+                Frequently Asked Questions
+              </span>
+            </h2>
+            <p className="text-gray-400">
+              Everything you need to know about getting started.
+            </p>
+          </div>
+        </FadeInSection>
 
         <div className="space-y-4">
           {faqs.map((faq, index) => (
-            <div
-              key={index}
-              className={`bg-[#121214] border rounded-2xl overflow-hidden transition-all duration-300 ${
-                openIndex === index
-                  ? "border-orange-500/50 shadow-[0_0_30px_rgba(249,115,22,0.3)]"
-                  : "border-white/5 hover:border-white/10"
-              }`}
-            >
-              <button
-                className="w-full p-6 text-left flex items-center justify-between hover:bg-white/5 transition-colors"
-                onClick={() => handleFAQClick(index)}
+            <FadeInSection key={index} delay={index * 100}>
+              <div
+                className={`group rounded-2xl border transition-all duration-300 overflow-hidden ${
+                  openIndex === index
+                    ? "bg-white/5 border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.1)]"
+                    : "bg-white/5 border-white/5 hover:border-white/10 hover:bg-white/[0.07]"
+                }`}
               >
-                <span className="text-lg font-medium text-white pr-8">
-                  {faq.question}
-                </span>
-                {openIndex === index ? (
-                  <ChevronUp className="text-orange-500 shrink-0" size={24} />
-                ) : (
-                  <ChevronDown className="text-gray-400 shrink-0" size={24} />
-                )}
-              </button>
-              {openIndex === index && (
-                <div className="px-6 pb-6 animate-fade-in">
-                  <p className="text-gray-400 leading-relaxed">{faq.answer}</p>
+                <button
+                  onClick={() => handleFAQClick(index)}
+                  className="w-full text-left p-6 flex flex-row items-center justify-between focus:outline-none"
+                >
+                  <span
+                    className={`text-lg font-semibold transition-colors duration-300 ${
+                      openIndex === index ? "text-cyan-300" : "text-gray-200"
+                    }`}
+                  >
+                    {faq.question}
+                  </span>
+                  <div
+                    className={`relative flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300 ${
+                      openIndex === index
+                        ? "bg-cyan-500/20 rotate-180"
+                        : "bg-white/5 group-hover:bg-white/10"
+                    }`}
+                  >
+                    <ChevronDown
+                      size={20}
+                      className={`transition-colors duration-300 ${
+                        openIndex === index ? "text-cyan-400" : "text-gray-400"
+                      }`}
+                    />
+                  </div>
+                </button>
+                <div
+                  className={`grid transition-[grid-template-rows] duration-500 ease-in-out ${
+                    openIndex === index ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+                  }`}
+                >
+                  <div className="overflow-hidden">
+                    <div className="px-6 pb-6 pt-0">
+                      <p className="text-gray-400 leading-relaxed border-t border-white/5 pt-4">
+                        {faq.answer}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-              )}
-            </div>
+              </div>
+            </FadeInSection>
           ))}
         </div>
 
-        <div className="text-center mt-12 pt-8 border-t border-white/5">
-          <p className="text-gray-400 mb-6">Still have questions?</p>
-          <Button
-            variant="primary"
-            onClick={() => {
-              const contactSection = document.getElementById("contact");
-              if (contactSection) {
-                contactSection.scrollIntoView({ behavior: "smooth" });
-              }
-            }}
-          >
-            Contact Our Support Team
-          </Button>
-        </div>
       </div>
     </section>
   );
@@ -1028,15 +1135,10 @@ const LandingPage = () => {
     setActiveNav(sectionId);
     if (sectionId === "home") {
       window.scrollTo({ top: 0, behavior: "smooth" });
-    } else if (sectionId === "contact") {
-      const contactSection = document.getElementById("contact");
-      if (contactSection) {
-        contactSection.scrollIntoView({ behavior: "smooth" });
-      }
-    } else if (sectionId === "faq") {
-      const faqSection = document.getElementById("faq");
-      if (faqSection) {
-        faqSection.scrollIntoView({ behavior: "smooth" });
+    } else {
+      const section = document.getElementById(sectionId);
+      if (section) {
+        section.scrollIntoView({ behavior: "smooth" });
       }
     }
   };
@@ -1082,9 +1184,10 @@ const LandingPage = () => {
     }
   };
   return (
-    <div className="min-h-screen bg-[#050505] text-white selection:bg-orange-500/30 font-sans overflow-x-hidden">
+    <div className="min-h-screen bg-[#020617] text-white selection:bg-cyan-500/30 font-sans overflow-x-hidden relative">
+      <div className="fixed inset-0 bg-gradient-to-b from-indigo-950/20 via-[#020617] to-[#020617] -z-50 pointer-events-none"></div>
       {/* Navbar */}
-      <nav className="fixed top-0 w-full z-50 bg-[#050505]/80 backdrop-blur-md border-b border-white/5">
+      <nav className="fixed top-0 w-full z-50 bg-[#020617]/80 backdrop-blur-xl border-b border-white/5 transition-all duration-300 supports-[backdrop-filter]:bg-[#020617]/60">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div
             className="flex items-center gap-2 cursor-pointer group"
@@ -1094,11 +1197,14 @@ const LandingPage = () => {
               setActiveNav("home");
             }}
           >
-            <Activity
-              className="text-orange-500 group-hover:scale-110 transition-transform duration-300"
-              size={24}
-            />
-            <span className="text-xl font-bold tracking-tight bg-linear-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
+            <div className="relative">
+              <div className="absolute inset-0 bg-cyan-500 blur-lg opacity-20 group-hover:opacity-40 transition-opacity duration-300" />
+              <Activity
+                className="text-cyan-400 relative z-10 group-hover:scale-110 transition-transform duration-300"
+                size={28}
+              />
+            </div>
+            <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-cyan-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent group-hover:opacity-80 transition-opacity">
               Holistic Wellness Monitor
             </span>
           </div>
@@ -1124,431 +1230,528 @@ const LandingPage = () => {
                     scrollToSection(item.id);
                   }
                 }}
-                className={`relative px-4 py-2 rounded-full transition-all duration-300 ${
+                className={`relative px-4 py-2 rounded-full transition-all duration-300 overflow-hidden group ${
                   activeNav === item.id
-                    ? "text-white bg-linear-to-r from-orange-500/20 to-orange-600/10 border border-orange-500/30 shadow-[0_0_15px_rgba(249,115,22,0.3)]"
-                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                    ? "text-white"
+                    : "text-gray-400 hover:text-white"
                 }`}
               >
-                {item.label}
-                {activeNav === item.id && (
-                  <span className="absolute inset-0 rounded-full border border-orange-500/50 animate-ping opacity-75"></span>
-                )}
+                <div
+                  className={`absolute inset-0 bg-gradient-to-r from-orange-500/20 to-orange-600/10 transition-opacity duration-300 ${
+                    activeNav === item.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                  }`}
+                />
+                 <div
+                  className={`absolute inset-0 border border-orange-500/30 rounded-full transition-opacity duration-300 ${
+                    activeNav === item.id ? "opacity-100 shadow-[0_0_15px_rgba(249,115,22,0.3)]" : "opacity-0 group-hover:opacity-50"
+                  }`}
+                />
+                <span className="relative z-10">{item.label}</span>
               </button>
             ))}
           </div>
           {renderAuthButtons()}
-          {/* <div className="flex items-center gap-4">
-            <button
-              className="text-sm font-medium text-gray-300 hover:text-orange-400 transition-colors px-4 py-2 rounded-full hover:bg-white/5"
-              onClick={handleSignIn}
-            >
-              Sign In
-            </button>
-            <Button
-              size="sm"
-              onClick={handleGetStarted}
-              className="relative overflow-hidden group"
-            >
-              <span className="relative z-10">Get Started</span>
-              <span className="absolute inset-0 bg-linear-to-r from-orange-600 to-orange-700 translate-x-full group-hover:translate-x-0 transition-transform duration-300"></span>
-            </Button>
-          </div> */}
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 px-6 overflow-hidden">
+      <section className="relative pt-32 pb-20 px-6 overflow-hidden min-h-[90vh] flex flex-col justify-center">
         {/* Ambient Glows */}
-        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-orange-500/20 rounded-full blur-[120px] -translate-y-1/2 pointer-events-none animate-pulse"></div>
-        <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[120px] -translate-y-1/2 pointer-events-none animate-pulse delay-1000"></div>
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <Blob className="bg-indigo-600/40 w-[500px] h-[500px] top-0 left-1/4 -translate-x-1/2 -translate-y-1/2 blur-[120px] animation-delay-2000 mix-blend-screen" />
+          <Blob className="bg-cyan-600/40 w-[500px] h-[500px] bottom-0 right-1/4 translate-x-1/2 translate-y-1/2 blur-[120px] animation-delay-4000 mix-blend-screen" />
+          <Blob className="bg-fuchsia-600/30 w-[400px] h-[400px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 blur-[100px] mix-blend-screen" />
+        </div>
 
         <div className="max-w-7xl mx-auto text-center relative z-10">
-          <h1 className="text-3xl md:text-5xl font-bold tracking-tight mb-6 bg-linear-to-b from-white to-gray-400 bg-clip-text text-transparent min-h-[120px] md:min-h-[140px] flex items-center justify-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 mb-8 animate-fade-in-up backdrop-blur-sm">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+            </span>
+            <span className="text-xs font-bold text-indigo-200 tracking-wide uppercase">v2.0 Now Live</span>
+          </div>
+          
+          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 bg-gradient-to-r from-white via-cyan-100 to-indigo-200 bg-clip-text text-transparent min-h-[140px] flex items-center justify-center filter drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]">
             <AnimatedText text="Health That Speaks Through Visuals" />
           </h1>
-          <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed animate-fade-in-up opacity-0">
+          
+          <p className="text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed animate-fade-in-up opacity-0 animation-delay-2000 font-light">
             Track every heartbeat, step, sleep, and vital sign with real-time
             insights—all in one intuitive dashboard.
           </p>
+          
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up opacity-0" style={{ animationDelay: '0.4s' }}>
+             <Button
+              size="lg"
+              onClick={handleGetStarted}
+              className="w-full sm:w-auto text-lg bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 shadow-[0_0_30px_rgba(6,182,212,0.4)] hover:shadow-[0_0_50px_rgba(6,182,212,0.6)] hover:-translate-y-1 transition-all duration-300 border-0"
+            >
+              Start Monitoring Free
+            </Button>
+            <Button
+              variant="secondary"
+              size="lg"
+              onClick={() => scrollToSection("features")}
+              className="w-full sm:w-auto text-lg hover:-translate-y-1 transition-all duration-300"
+            >
+              Explore Features
+            </Button>
+          </div>
         </div>
       </section>
 
       {/* Health Metrics Section - Terminal Layout */}
-      <section className="py-3 px-2 bg-[#08080a]" id="features">
-        <div className="max-w-7xl mx-auto">
+      <section className="py-24 px-6 relative" id="features">
+        <div className="absolute inset-0 bg-[#08080a] opacity-80 z-0"></div>
+        <div className="absolute top-0 right-0 w-1/3 h-full bg-linear-to-l from-orange-500/5 to-transparent pointer-events-none"></div>
+        
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">
+              <span className="bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">Power in Your Hands</span>
+            </h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              Advanced visualization tools designed to help you understand your body better.
+            </p>
+          </div>
+
           {/* Terminal Grid Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-fade-in-up opacity-0">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Left Column - BMI Calculator */}
-            <div className="lg:col-span-3">
-              <BMICalculator />
+            <div className="lg:col-span-3 space-y-6">
+              <FadeInSection delay={0}>
+                <div className="hover:scale-[1.02] transition-transform duration-500">
+                  <BMICalculator />
+                </div>
+              </FadeInSection>
             </div>
 
             {/* Middle Column - Terminal */}
             <div className="lg:col-span-5">
-              <DataTerminal />
+              <FadeInSection delay={200}>
+                <div className="shadow-2xl shadow-green-500/10 hover:shadow-green-500/20 transition-all duration-500">
+                  <DataTerminal />
+                </div>
+              </FadeInSection>
             </div>
 
             {/* Right Column - Health Overview */}
-            <div className="lg:col-span-4">
-              <WaterIntakeChart />
+            <div className="lg:col-span-4 space-y-6">
+              <FadeInSection delay={400}>
+                <div className="hover:scale-[1.02] transition-transform duration-500">
+                   <WaterIntakeChart />
+                </div>
+              </FadeInSection>
             </div>
           </div>
         </div>
       </section>
 
       {/* Stats Section */}
-      <section className="py-24 px-6 relative">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">
-              Holistic Wellness Monitor Facts
-            </h2>
-            <p className="text-gray-400">
-              Real data from our community of health-conscious users.
-            </p>
-          </div>
+      <section className="py-24 px-6 relative overflow-hidden">
+        <Blob className="bg-fuchsia-600/20 w-[600px] h-[600px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 blur-[150px] mix-blend-screen" />
+        <div className="max-w-7xl mx-auto relative z-10">
+          <FadeInSection>
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-5xl font-bold mb-4">
+               <span className="bg-gradient-to-r from-cyan-200 via-indigo-300 to-purple-300 bg-clip-text text-transparent">Numbers That Matter</span>
+              </h2>
+              <p className="text-gray-400">
+                Real data from our community of health-conscious users.
+              </p>
+            </div>
+          </FadeInSection>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Counter
-              end={1400}
-              label="Exercises Logged"
-              sub="Using visual and time-based tracking"
-              grad="from-orange-500/20 to-orange-900/5"
-              border="border-orange-500/30"
-            />
-            <Counter
-              end={7.2}
-              label="Avg Sleep Tracked"
-              sub="Increase in 40% deep sleep modes"
-              grad="from-blue-500/20 to-blue-900/5"
-              border="border-blue-500/30"
-            />
-            <Counter
-              end={98.7}
-              label="% User Retention"
-              sub="Users who stick to their daily health goals"
-              grad="from-yellow-500/20 to-yellow-900/5"
-              border="border-yellow-500/30"
-            />
-            <Counter
-              end="1K+"
-              label="Active Users"
-              sub="Active daily users across multiple platforms"
-              grad="from-red-500/20 to-red-900/5"
-              border="border-red-500/30"
-            />
+            <FadeInSection delay={100} className="h-full">
+              <Counter
+                end={1400}
+                label="Exercises Logged"
+                sub="Using visual and time-based tracking"
+                grad="from-amber-500/20 to-orange-600/10"
+                border="border-amber-500/20 hover:border-amber-500/50"
+              />
+            </FadeInSection>
+            <FadeInSection delay={200} className="h-full">
+              <Counter
+                end={7.2}
+                label="Avg Sleep Tracked"
+                sub="Increase in 40% deep sleep modes"
+                grad="from-indigo-500/20 to-blue-600/10"
+                border="border-indigo-500/20 hover:border-indigo-500/50"
+              />
+            </FadeInSection>
+            <FadeInSection delay={300} className="h-full">
+              <Counter
+                end={98.7}
+                label="% User Retention"
+                sub="Users who stick to their daily health goals"
+                grad="from-emerald-500/20 to-teal-600/10"
+                border="border-emerald-500/20 hover:border-emerald-500/50"
+              />
+            </FadeInSection>
+            <FadeInSection delay={400} className="h-full">
+              <Counter
+                end="1K+"
+                label="Active Users"
+                sub="Active daily users across multiple platforms"
+                grad="from-rose-500/20 to-pink-600/10"
+                border="border-rose-500/20 hover:border-rose-500/50"
+              />
+            </FadeInSection>
           </div>
         </div>
       </section>
 
       {/* Testimonials */}
-      <section className="py-24 px-6 border-b border-white/5">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl md:text-5xl font-bold text-center mb-16">
-            Testimonials
-          </h2>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="p-10 rounded-3xl bg-linear-to-br from-[#18181b] to-black border border-white/5 flex flex-col justify-center text-center lg:text-left animate-fade-in-up opacity-0">
-              <div className="text-6xl font-bold text-white mb-2">4.8</div>
-              <div className="flex justify-center lg:justify-start gap-1 text-orange-500 mb-4">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <Star key={i} fill="currentColor" size={20} />
-                ))}
-              </div>
-              <p className="text-sm text-gray-400">
-                500+ reviews
-                <br />
-                Across iOS, Android and TrustPilot
-              </p>
-            </div>
+      <section className="py-24 border-b border-white/5 relative overflow-hidden">
+         <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+        <div className="max-w-7xl mx-auto px-6 mb-16">
+          <FadeInSection>
+            <h2 className="text-3xl md:text-5xl font-bold text-center">
+              <span className="bg-gradient-to-r from-orange-200 via-rose-200 to-pink-300 bg-clip-text text-transparent">Community Trust</span>
+            </h2>
+          </FadeInSection>
+        </div>
 
-            {[
-              {
-                text: "Holistic Wellness Monitor helped me finally connect the dots between my sleep and my mood. The visuals are clear, and I actually want to check it daily.",
-                author: "Ishita Bhosle",
-                role: "Wellness Coach",
-              },
-              {
-                text: "Tracking steps is easy. But Holistic Wellness Monitor made me rethink why I was tired even after 8 hours of sleep. It's now my daily dashboard.",
-                author: "Ashok Kumar",
-                role: "UX Researcher",
-              },
-            ].map((review, i) => (
-              <div
-                key={i}
-                className="p-10 rounded-3xl bg-[#121214] border border-white/5 relative flex flex-col animate-fade-in-up opacity-0"
-                style={{ animationDelay: `${(i + 1) * 200}ms` }}
-              >
-                <p className="text-lg leading-relaxed text-gray-300 mb-8 italic">
-                  "{review.text}"
-                </p>
-                <div className="mt-auto flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-gray-700 overflow-hidden">
-                    <img
-                      src={`https://picsum.photos/seed/${i + 15}/200`}
-                      alt="user"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div>
-                    <h5 className="font-bold text-white text-sm">
-                      {review.author}
-                    </h5>
-                    <span className="text-xs text-gray-500">{review.role}</span>
-                  </div>
+        {/* Infinite Scroll Container */}
+        <div className="relative w-full overflow-hidden">
+          {/* Gradients for fading edges */}
+          <div className="absolute left-0 top-0 bottom-0 w-12 md:w-32 bg-gradient-to-r from-[#050505] to-transparent z-10 pointer-events-none"></div>
+          <div className="absolute right-0 top-0 bottom-0 w-12 md:w-32 bg-gradient-to-l from-[#050505] to-transparent z-10 pointer-events-none"></div>
+          
+          <div className="flex animate-infinite-scroll w-max gap-8 hover:[animation-play-state:paused] py-4">
+             {/* Original Set */}
+             {[
+                {
+                  rating: "4.8",
+                  text: "This app revolutionized how I track my health. The visual insights are stunning and easy to understand.",
+                  author: "Sarah J.",
+                  role: "Yoga Instructor",
+                  color: "bg-orange-500",
+                },
+                {
+                   rating: "4.9",
+                   text: "Finally, a wellness monitor that looks as good as it functions. The dark mode is perfect for night checking.",
+                   author: "Michael C.",
+                   role: "Tech Professional",
+                   color: "bg-blue-500",
+                },
+                 {
+                   rating: "4.7",
+                   text: "Data security was my main concern, but HWM's transparent privacy policies put me at ease.",
+                   author: "Dr. Emily R.",
+                   role: "Physician",
+                   color: "bg-green-500",
+                },
+                 {
+                  rating: "4.9",
+                  text: "The hydration tracker is a game changer. I've never been this consistent with my water intake.",
+                  author: "David K.",
+                  role: "Athlete",
+                   color: "bg-cyan-500",
+                },
+             ].map((item, i) => (
+                <div key={`original-${i}`} className="w-[350px] md:w-[400px] shrink-0">
+                   <div className="p-8 rounded-3xl bg-indigo-950/20 backdrop-blur-md border border-indigo-500/10 h-full flex flex-col justify-between hover:border-indigo-500/30 transition-colors duration-500 group hover:shadow-[0_0_20px_rgba(99,102,241,0.1)]">
+                      <div>
+                        <div className="flex justify-between items-start mb-6">
+                           <div className="text-4xl font-bold text-white">{item.rating}</div>
+                           <div className="flex gap-1 text-orange-500">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <Star key={star} fill="currentColor" size={16} />
+                              ))}
+                           </div>
+                        </div>
+                        <p className="text-gray-400 leading-relaxed mb-6 italic">"{item.text}"</p>
+                      </div>
+                      <div className="flex items-center gap-4 pt-6 border-t border-white/5">
+                         <div className={`w-10 h-10 rounded-full ${item.color}/20 flex items-center justify-center text-${item.color.split('-')[1]}-500 font-bold`}>
+                            {item.author.charAt(0)}
+                         </div>
+                         <div>
+                            <div className="text-white font-medium">{item.author}</div>
+                            <div className="text-xs text-gray-500">{item.role}</div>
+                         </div>
+                      </div>
+                   </div>
                 </div>
-              </div>
-            ))}
+             ))}
+
+             {/* Duplicate Set for Seamless Loop */}
+             {[
+                {
+                  rating: "4.8",
+                  text: "This app revolutionized how I track my health. The visual insights are stunning and easy to understand.",
+                  author: "Sarah J.",
+                  role: "Yoga Instructor",
+                   color: "bg-orange-500",
+                },
+                {
+                   rating: "4.9",
+                   text: "Finally, a wellness monitor that looks as good as it functions. The dark mode is perfect for night checking.",
+                   author: "Michael C.",
+                   role: "Tech Professional",
+                    color: "bg-blue-500",
+                },
+                 {
+                   rating: "4.7",
+                   text: "Data security was my main concern, but HWM's transparent privacy policies put me at ease.",
+                   author: "Dr. Emily R.",
+                   role: "Physician",
+                    color: "bg-green-500",
+                },
+                 {
+                  rating: "4.9",
+                  text: "The hydration tracker is a game changer. I've never been this consistent with my water intake.",
+                  author: "David K.",
+                  role: "Athlete",
+                   color: "bg-cyan-500",
+                },
+             ].map((item, i) => (
+                <div key={`duplicate-${i}`} className="w-[350px] md:w-[400px] shrink-0">
+                   <div className="p-8 rounded-3xl bg-indigo-950/20 backdrop-blur-md border border-indigo-500/10 h-full flex flex-col justify-between hover:border-indigo-500/30 transition-colors duration-500 group hover:shadow-[0_0_20px_rgba(99,102,241,0.1)]">
+                      <div>
+                        <div className="flex justify-between items-start mb-6">
+                           <div className="text-4xl font-bold text-white">{item.rating}</div>
+                           <div className="flex gap-1 text-orange-500">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <Star key={star} fill="currentColor" size={16} />
+                              ))}
+                           </div>
+                        </div>
+                        <p className="text-gray-400 leading-relaxed mb-6 italic">"{item.text}"</p>
+                      </div>
+                      <div className="flex items-center gap-4 pt-6 border-t border-white/5">
+                         <div className={`w-10 h-10 rounded-full ${item.color}/20 flex items-center justify-center text-${item.color.split('-')[1]}-500 font-bold`}>
+                            {item.author.charAt(0)}
+                         </div>
+                         <div>
+                            <div className="text-white font-medium">{item.author}</div>
+                            <div className="text-xs text-gray-500">{item.role}</div>
+                         </div>
+                      </div>
+                   </div>
+                </div>
+             ))}
           </div>
         </div>
       </section>
 
       {/* FAQ Section */}
       <FAQSection />
+      
       <section className="py-24 px-6 relative overflow-hidden" id="contact">
         {/* Background glow */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-orange-500/10 blur-[100px] rounded-full pointer-events-none animate-pulse"></div>
 
-        <div className="max-w-4xl mx-auto glass-panel p-10 md:p-16 rounded-3xl relative z-10 flex flex-col md:flex-row items-center gap-12 animate-fade-in-up opacity-0">
-          <div className="flex-1">
-            <div className="mb-6 overflow-hidden rounded-2xl">
-              <img
-                src={email}
-                alt="Health Monitoring Dashboard"
-                className="w-full h-64 object-cover rounded-2xl hover:scale-105 transition-transform duration-500"
-              />
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Let's get you <br />
-              started
-            </h2>
-            <p className="text-gray-400 mb-4">
-              Join thousands of users who transformed their health journey with
-              visual insights.
-            </p>
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <CheckCircle size={16} className="text-green-500" />
-              <span>Real-time health tracking</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <CheckCircle size={16} className="text-green-500" />
-              <span>Secure & private data</span>
-            </div>
-          </div>
-
-          <div className="flex-1 w-full">
-            <div className="space-y-4">
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <input
-                    type="text"
-                    placeholder="Full Name *"
-                    className="bg-white/5 border-b border-white/20 px-4 py-3 text-sm focus:border-orange-500 focus:outline-none transition-colors w-full"
-                    defaultValue={user?.name || ""}
-                    readOnly={!!user}
-                  />
-                  <input
-                    type="email"
-                    placeholder="Email *"
-                    className="bg-white/5 border-b border-white/20 px-4 py-3 text-sm focus:border-orange-500 focus:outline-none transition-colors w-full"
-                    defaultValue={user?.email || ""}
-                    readOnly={!!user}
+        <div className="max-w-4xl mx-auto">
+          <FadeInSection>
+            <div className="glass-panel p-10 md:p-16 rounded-3xl relative z-10 flex flex-col md:flex-row items-center gap-12 bg-slate-900/30 backdrop-blur-2xl border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] hover:border-white/20 transition-colors duration-500">
+              <div className="flex-1">
+                <div className="mb-6 overflow-hidden rounded-2xl relative group">
+                  <div className="absolute inset-0 bg-orange-500/20 opacity-0 group-hover:opacity-100 transition-opacity z-10"></div>
+                  <img
+                    src={email}
+                    alt="Health Monitoring Dashboard"
+                    className="w-full h-64 object-cover rounded-2xl group-hover:scale-110 transition-transform duration-700"
                   />
                 </div>
-                <input
-                  type="text"
-                  placeholder="Your Goal (Subject)"
-                  value={formData.subject}
-                  onChange={(e) =>
-                    setFormData({ ...formData, subject: e.target.value })
-                  }
-                  required
-                  className="w-full bg-white/5 border-b border-white/20 px-4 py-3 text-sm focus:border-orange-500 focus:outline-none transition-colors"
-                />
-                <textarea
-                  placeholder="Type Your Message..."
-                  value={formData.message}
-                  onChange={(e) =>
-                    setFormData({ ...formData, message: e.target.value })
-                  }
-                  required
-                  className="w-full bg-white/5 border-b border-white/20 px-4 py-3 text-sm focus:border-orange-500 focus:outline-none transition-colors h-24 resize-none"
-                ></textarea>
-
-                {status.msg && (
-                  <div
-                    className={`text-sm p-3 rounded ${
-                      status.type === "success"
-                        ? "bg-green-500/20 text-green-400"
-                        : "bg-red-500/20 text-red-400"
-                    }`}
-                  >
-                    {status.msg}
+                <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+                  Let's get you <br />
+                  started
+                </h2>
+                <p className="text-gray-400 mb-6">
+                  Join thousands of users who transformed their health journey with
+                  visual insights.
+                </p>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 text-sm text-gray-300">
+                    <div className="p-1 rounded-full bg-green-500/10 text-green-500">
+                      <CheckCircle size={14} />
+                    </div>
+                    <span>Real-time health tracking</span>
                   </div>
-                )}
-
-                <div className="flex items-center justify-between pt-4">
-                  <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? "Sending..." : "Send Message"}{" "}
-                    <ArrowRight size={14} className="ml-2" />
-                  </Button>
+                  <div className="flex items-center gap-3 text-sm text-gray-300">
+                    <div className="p-1 rounded-full bg-green-500/10 text-green-500">
+                      <CheckCircle size={14} />
+                    </div>
+                    <span>Secure & private data</span>
+                  </div>
                 </div>
-              </form>
+              </div>
+
+              <div className="flex-1 w-full">
+                <div className="space-y-4">
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <input
+                        type="text"
+                        placeholder="Full Name *"
+                        className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-orange-500 focus:bg-white/10 focus:outline-none transition-all w-full text-white placeholder-gray-500"
+                        defaultValue={user?.name || ""}
+                        readOnly={!!user}
+                      />
+                      <input
+                        type="email"
+                        placeholder="Email *"
+                        className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-orange-500 focus:bg-white/10 focus:outline-none transition-all w-full text-white placeholder-gray-500"
+                        defaultValue={user?.email || ""}
+                        readOnly={!!user}
+                      />
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="Your Goal (Subject)"
+                      value={formData.subject}
+                      onChange={(e) =>
+                        setFormData({ ...formData, subject: e.target.value })
+                      }
+                      required
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-orange-500 focus:bg-white/10 focus:outline-none transition-all text-white placeholder-gray-500"
+                    />
+                    <textarea
+                      placeholder="Type Your Message..."
+                      value={formData.message}
+                      onChange={(e) =>
+                        setFormData({ ...formData, message: e.target.value })
+                      }
+                      required
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-orange-500 focus:bg-white/10 focus:outline-none transition-all h-32 resize-none text-white placeholder-gray-500"
+                    ></textarea>
+
+                    {status.msg && (
+                      <div
+                        className={`text-sm p-3 rounded-xl ${
+                          status.type === "success"
+                            ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                            : "bg-red-500/20 text-red-400 border border-red-500/30"
+                        }`}
+                      >
+                        {status.msg}
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-between pt-2">
+                       <Button type="submit" disabled={isSubmitting} className="w-full justify-center shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40">
+                        {isSubmitting ? "Sending..." : "Send Message"}{" "}
+                        <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                      </Button>
+                    </div>
+                  </form>
+                </div>
+              </div>
             </div>
-          </div>
+          </FadeInSection>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-6 px-6 border-t border-white/5 bg-[#0a0a0a]">
+      {/* Footer */}
+      <footer className="py-12 px-6 border-t border-white/5 bg-[#020617] relative overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12 mb-12">
             {/* Brand Column */}
-            <div className="lg:col-span-2">
-              <div className="flex items-center gap-3 mb-6">
-                <Activity className="text-orange-500" size={28} />
-                <span className="text-2xl font-bold">
+            <div className="lg:col-span-2 space-y-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-br from-orange-500/20 to-orange-600/10 rounded-xl border border-orange-500/20">
+                  <Activity className="text-orange-500" size={24} />
+                </div>
+                <span className="text-2xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
                   Holistic Wellness Monitor
                 </span>
               </div>
-              <p className="text-gray-400 text-sm leading-relaxed mb-6 max-w-md">
+              <p className="text-gray-400 text-sm leading-relaxed max-w-sm font-light">
                 Track every heartbeat, step, sleep, and vital sign with
                 real-time insights—all in one intuitive dashboard.
               </p>
               <div className="flex items-center gap-4">
-                <a
-                  href="https://linkedin.com/in/soumyosishpal"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors hover:scale-110 hover:shadow-[0_0_15px_rgba(37,99,235,0.3)]"
-                >
-                  <Linkedin
-                    size={18}
-                    className="text-gray-400 hover:text-blue-400 transition-colors"
-                  />
-                </a>
-                <a
-                  href="https://github.com/Soumyosish"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors hover:scale-110 hover:shadow-[0_0_15px_rgba(156,163,175,0.3)]"
-                >
-                  <Github
-                    size={18}
-                    className="text-gray-400 hover:text-white transition-colors"
-                  />
-                </a>
-                <a
-                  href="mailto:support@holisticwellness.com"
-                  className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors hover:scale-110 hover:shadow-[0_0_15px_rgba(249,115,22,0.3)]"
-                >
-                  <Mail
-                    size={18}
-                    className="text-gray-400 hover:text-orange-400 transition-colors"
-                  />
-                </a>
+                {[
+                  { icon: Linkedin, href: "https://linkedin.com/in/soumyosishpal", color: "hover:text-blue-400 hover:bg-blue-500/10 hover:border-blue-500/20" },
+                  { icon: Github, href: "https://github.com/Soumyosish", color: "hover:text-white hover:bg-white/10 hover:border-white/20" },
+                  { icon: Mail, href: "mailto:support@holisticwellness.com", color: "hover:text-orange-400 hover:bg-orange-500/10 hover:border-orange-500/20" }
+                ].map((social, i) => (
+                  <a
+                    key={i}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`w-10 h-10 rounded-full bg-white/5 border border-white/5 flex items-center justify-center transition-all duration-300 hover:scale-110 ${social.color}`}
+                  >
+                    <social.icon size={18} className="text-gray-400 transition-colors" />
+                  </a>
+                ))}
               </div>
             </div>
 
             {/* Quick Links */}
             <div>
-              <h4 className="text-white font-bold mb-6 text-lg">Quick Links</h4>
+              <h4 className="text-white font-bold mb-6 text-lg tracking-tight">Quick Links</h4>
               <ul className="space-y-4">
-                <li>
-                  <button
-                    onClick={() => scrollToSection("home")}
-                    className="text-gray-400 hover:text-white transition-colors text-sm flex items-center gap-2 group"
-                  >
-                    <Home
-                      size={16}
-                      className="group-hover:text-orange-500 transition-colors"
-                    />
-                    Home
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => {
-                      navigate("/dashboard");
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                    }}
-                    className="text-gray-400 hover:text-white transition-colors text-sm flex items-center gap-2 group"
-                  >
-                    <LayoutDashboard
-                      size={16}
-                      className="group-hover:text-orange-500 transition-colors"
-                    />
-                    Dashboard
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => scrollToSection("faq")}
-                    className="text-gray-400 hover:text-white transition-colors text-sm flex items-center gap-2 group"
-                  >
-                    <HelpCircle
-                      size={16}
-                      className="group-hover:text-orange-500 transition-colors"
-                    />
-                    FAQ
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => scrollToSection("contact")}
-                    className="text-gray-400 hover:text-white transition-colors text-sm flex items-center gap-2 group"
-                  >
-                    <Mail
-                      size={16}
-                      className="group-hover:text-orange-500 transition-colors"
-                    />
-                    Contact
-                  </button>
-                </li>
+                {[
+                  { label: "Home", icon: Home, action: () => scrollToSection("home") },
+                  { label: "Dashboard", icon: LayoutDashboard, action: () => { navigate("/dashboard"); window.scrollTo({ top: 0, behavior: "smooth" }); } },
+                  { label: "FAQ", icon: HelpCircle, action: () => scrollToSection("faq") },
+                  { label: "Contact", icon: Mail, action: () => scrollToSection("contact") }
+                ].map((link, i) => (
+                  <li key={i}>
+                    <button
+                      onClick={link.action}
+                      className="text-gray-400 hover:text-white transition-all duration-300 text-sm flex items-center gap-3 group"
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-orange-500/0 group-hover:bg-orange-500 transition-all duration-300"></span>
+                      <span className="group-hover:translate-x-1 transition-transform">{link.label}</span>
+                    </button>
+                  </li>
+                ))}
               </ul>
             </div>
 
-            {/* Contact Info */}
+            {/* Legal Links */}
             <div>
-              <h4 className="text-white font-bold mb-6 text-lg">Contact Us</h4>
+              <h4 className="text-white font-bold mb-6 text-lg tracking-tight">Legal</h4>
               <ul className="space-y-4">
-                <li className="flex items-start gap-3 group">
-                  <Mail
-                    className="text-gray-400 mt-0.5 group-hover:text-orange-500 transition-colors"
-                    size={16}
-                  />
-                  <span className="text-gray-400 text-sm group-hover:text-white transition-colors">
-                    support@holisticwellness.com
-                  </span>
-                </li>
-                <li className="flex items-start gap-3 group">
-                  <Phone
-                    className="text-gray-400 mt-0.5 group-hover:text-orange-500 transition-colors"
-                    size={16}
-                  />
-                  <span className="text-gray-400 text-sm group-hover:text-white transition-colors">
-                    +91 9876543210
-                  </span>
-                </li>
-                <li className="flex items-start gap-3 group">
-                  <MapPin
-                    className="text-gray-400 mt-0.5 group-hover:text-orange-500 transition-colors"
-                    size={16}
-                  />
-                  <span className="text-gray-400 text-sm group-hover:text-white transition-colors">
-                    Hollistic Wellness Centre, New Delhi, India
-                  </span>
-                </li>
+                {["Privacy Policy", "Terms of Service", "Cookie Policy", "Disclaimer"].map((item, i) => (
+                  <li key={i}>
+                    <a href="#" className="text-gray-400 hover:text-white transition-all duration-300 text-sm group flex items-center gap-2">
+                       <span className="w-1.5 h-1.5 rounded-full bg-orange-500/0 group-hover:bg-orange-500 transition-all duration-300"></span>
+                       <span className="group-hover:translate-x-1 transition-transform">{item}</span>
+                    </a>
+                  </li>
+                ))}
               </ul>
+            </div>
+
+            {/* Newsletter */}
+            <div>
+              <h4 className="text-white font-bold mb-6 text-lg tracking-tight">Stay Updated</h4>
+              <p className="text-gray-400 text-xs mb-4">
+                Subscribe to our newsletter for the latest health tips and feature updates.
+              </p>
+              <div className="relative group">
+                 <input 
+                    type="email" 
+                    placeholder="Enter email" 
+                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-sm focus:border-orange-500 focus:bg-white/10 focus:outline-none transition-all text-white placeholder-gray-600 pr-10"
+                 />
+                 <button className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-orange-500 rounded-lg text-white opacity-0 group-focus-within:opacity-100 transition-all hover:bg-orange-600">
+                    <ArrowRight size={14} />
+                 </button>
+              </div>
             </div>
           </div>
 
-          {/* Copyright */}
-          <div className="mt-16 pt-8 border-t border-white/5">
-            <p className="text-gray-500 text-sm text-center">
-              Copyright © 2025 Holistic Wellness Monitor. All rights reserved.
+          <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-gray-500 text-sm text-center md:text-left">
+              &copy; {new Date().getFullYear()} Holistic Wellness Monitor. All rights reserved.
             </p>
+            <div className="flex items-center gap-1.5 text-sm text-gray-500 bg-white/5 px-4 py-2 rounded-full border border-white/5">
+              <span>Made with</span>
+              <Heart size={14} className="text-red-500 fill-red-500 animate-pulse" />
+              <span>by Soumyosish Pal</span>
+            </div>
           </div>
         </div>
       </footer>
