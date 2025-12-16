@@ -16,6 +16,11 @@ import mealRoutes from "./routes/mealRoutes.js";
 import workoutRoutes from "./routes/workoutRoutes.js";
 import summaryRoutes from "./routes/summaryRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js";
+import userProfileRoutes from "./routes/userProfileRoutes.js";
+import foodDatabaseRoutes from "./routes/foodDatabaseRoutes.js";
+import activityRoutes from "./routes/activityRoutes.js";
+import reportRoutes from "./routes/reportRoutes.js";
+import rewardsRoutes from "./routes/rewardsRoutes.js";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -44,8 +49,13 @@ app.use(limiter);
 // ---- ROUTES
 app.use("/api/auth", authRoutes);
 app.use("/api/auth", googleAuthRoutes);
+app.use("/api/profile", userProfileRoutes);
 app.use("/api/meals", mealRoutes);
+app.use("/api/foods", foodDatabaseRoutes);
+app.use("/api/activity", activityRoutes);
+app.use("/api/report", reportRoutes);
 app.use("/api/workouts", workoutRoutes);
+app.use("/api/rewards", rewardsRoutes);
 app.use("/api/summary", summaryRoutes);
 app.use("/api/contact", contactRoutes);
 
