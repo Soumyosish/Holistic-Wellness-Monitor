@@ -21,6 +21,7 @@ import foodDatabaseRoutes from "./routes/foodDatabaseRoutes.js";
 import activityRoutes from "./routes/activityRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
 import rewardsRoutes from "./routes/rewardsRoutes.js";
+import newsletterRoutes from "./routes/newsletterRoutes.js";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -58,6 +59,7 @@ app.use("/api/workouts", workoutRoutes);
 app.use("/api/rewards", rewardsRoutes);
 app.use("/api/summary", summaryRoutes);
 app.use("/api/contact", contactRoutes);
+app.use("/api/newsletter", newsletterRoutes);
 
 // ---- health check
 app.get("/", (req, res) => res.json({ msg: "API running" }));

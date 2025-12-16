@@ -81,7 +81,8 @@ export const getProfile = async (req, res) => {
   res.json(req.user);
 };
 import crypto from "crypto";
-import nodemailer from "nodemailer";
+import { sendEmail } from "../utils/emailService.js";
+
 export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -93,11 +94,11 @@ export const forgotPassword = async (req, res) => {
     user.resetPasswordToken = token;
     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
     await user.save();
+    
+    // Use env variable or default
     const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
-    const resetUrl = `${FRONTEND_URL.replace(
-      /\/$/,
-      ""
-    )}/reset-password/${token}`;
+    const resetUrl = `${FRONTEND_URL.replace(/\/$/, "")}/reset-password/${token}`;
+    
     const message = `
       <p>You requested a password reset</p>
       <p>Click <a href="${resetUrl}">here</a> to reset your password.</p>
@@ -105,37 +106,21 @@ export const forgotPassword = async (req, res) => {
 
     // --- EMAIL SENDING LOGIC ---
     try {
-      const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS,
-        },
+      await sendEmail({
+        to: user.email,
+        subject: "Password Reset",
+        html: message,
       });
-      // If credentials exist, send email
-      if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-        await transporter.sendMail({
-          from: process.env.EMAIL_USER,
-          to: user.email,
-          subject: "Password Reset",
-          html: message,
-        });
-        console.log(`Email sent to: ${user.email}`);
-        res
-          .status(200)
-          .json({ success: true, data: "Password reset email sent" });
-      } else {
-        console.warn("EMAIL_USER/PASS not set. Logging reset link manually.");
-        res.status(200).json({
-          success: true,
-          data: "Password reset email sent (Simulated)",
-          resetUrl: resetUrl,
-        });
-      }
-      console.log("==========================================");
-      console.log(`RESET PASSWORD LINK FOR ${user.email}:`);
-      console.log(resetUrl);
-      console.log("==========================================");
+
+      // Check if simulated by checking env (simplified for response)
+      const isSimulated = !process.env.EMAIL_USER || !process.env.EMAIL_PASS;
+      
+      res.status(200).json({
+        success: true,
+        data: isSimulated ? "Password reset email sent (Simulated)" : "Password reset email sent",
+        resetUrl: isSimulated ? resetUrl : undefined,
+      });
+
     } catch (err) {
       console.error("Email send error:", err);
       // Clean up fields on failure
@@ -160,7 +145,7 @@ export const resetPassword = async (req, res) => {
 
     const user = await User.findOne({
       resetPasswordToken: token,
-      resetPasswordExpires: { $gt: Date.now() },
+      resetPasswordExpires: { $gt: new Date() },
     });
 
     if (!user) {
