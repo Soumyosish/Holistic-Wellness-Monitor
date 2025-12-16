@@ -1,56 +1,18 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.jpg";
-
 const Navbar = ({ user, logout }) => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
-  const [showNotifications, setShowNotifications] = useState(false);
+  // State for menus and modal
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const [notifications] = useState([
-    {
-      id: 1,
-      title: "Health Check Reminder",
-      message: "Your monthly health check is due tomorrow",
-      time: "10 min ago",
-      read: false,
-    },
-    {
-      id: 2,
-      title: "Sleep Pattern Alert",
-      message: "Your sleep duration dropped below 7 hours",
-      time: "2 hours ago",
-      read: false,
-    },
-    {
-      id: 3,
-      title: "Water Intake Goal",
-      message: "You've reached your daily water intake goal!",
-      time: "1 day ago",
-      read: true,
-    },
-    {
-      id: 4,
-      title: "Exercise Achievement",
-      message: "You completed 5 workouts this week",
-      time: "2 days ago",
-      read: true,
-    },
-  ]);
 
-  const notificationsRef = useRef(null);
   const profileMenuRef = useRef(null);
   const mobileMenuRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
-        notificationsRef.current &&
-        !notificationsRef.current.contains(event.target)
-      ) {
-        setShowNotifications(false);
-      }
       if (
         profileMenuRef.current &&
         !profileMenuRef.current.contains(event.target)
@@ -68,23 +30,13 @@ const Navbar = ({ user, logout }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const unreadNotificationsCount = notifications.filter((n) => !n.read).length;
-
-  const handleNotificationClick = () => {
-    setShowNotifications((prev) => !prev);
-    setShowProfileMenu(false);
-    setShowMobileMenu(false);
-  };
-
   const handleProfileClick = () => {
     setShowProfileMenu((prev) => !prev);
-    setShowNotifications(false);
     setShowMobileMenu(false);
   };
 
   const handleMobileMenuClick = () => {
     setShowMobileMenu((prev) => !prev);
-    setShowNotifications(false);
     setShowProfileMenu(false);
   };
 
@@ -93,20 +45,7 @@ const Navbar = ({ user, logout }) => {
     navigate("/");
   };
 
-  const handleSettings = () => {
-    alert("Opening settings...");
-    setShowProfileMenu(false);
-  };
 
-  const handleViewAllNotifications = () => {
-    alert("Viewing all notifications...");
-    setShowNotifications(false);
-  };
-
-  const markAllAsRead = () => {
-    alert("Marking all as read...");
-    setShowNotifications(false);
-  };
 
   // Get user initials for avatar
   const getUserInitials = () => {
@@ -228,87 +167,6 @@ const Navbar = ({ user, logout }) => {
             </svg>
           </button>
 
-          {/* Notification button */}
-          <div className="relative" ref={notificationsRef}>
-            <button
-              type="button"
-              onClick={handleNotificationClick}
-              className="relative flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-white border border-slate-200 shadow-sm text-slate-600 hover:bg-slate-50 transition"
-              aria-label="Notifications"
-            >
-              {unreadNotificationsCount > 0 && (
-                <span className="absolute -top-1 -right-1 h-4 w-4 sm:h-5 sm:w-5 rounded-full bg-red-500 border-2 border-white text-white text-[10px] sm:text-xs flex items-center justify-center font-bold">
-                  {unreadNotificationsCount}
-                </span>
-              )}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 sm:h-5 sm:w-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5" />
-                <path d="M9 17a3 3 0 0 0 6 0" />
-              </svg>
-            </button>
-
-            {/* Notifications dropdown */}
-            {showNotifications && (
-              <div className="md:absolute md:right-0 md:mt-2 md:w-80 fixed inset-x-3 top-20 md:inset-auto md:top-auto bg-white rounded-2xl shadow-xl border border-slate-200 z-50 overflow-hidden">
-                <div className="p-4 border-b border-slate-100">
-                  <div className="flex justify-between items-center">
-                    <h3 className="font-bold text-slate-800">Notifications</h3>
-                    <button
-                      onClick={markAllAsRead}
-                      className="text-sm text-sky-600 hover:text-sky-700 font-medium"
-                    >
-                      Mark all as read
-                    </button>
-                  </div>
-                </div>
-                <div className="max-h-80 overflow-y-auto">
-                  {notifications.map((notification) => (
-                    <div
-                      key={notification.id}
-                      className={`p-4 border-b border-slate-100 hover:bg-slate-50 cursor-pointer ${
-                        !notification.read ? "bg-sky-50" : ""
-                      }`}
-                    >
-                      <div className="flex items-start gap-3">
-                        <div
-                          className={`mt-1 h-2 w-2 rounded-full ${
-                            notification.read ? "bg-slate-300" : "bg-sky-500"
-                          }`}
-                        />
-                        <div className="flex-1">
-                          <h4 className="font-medium text-slate-800">
-                            {notification.title}
-                          </h4>
-                          <p className="text-sm text-slate-600 mt-1">
-                            {notification.message}
-                          </p>
-                          <span className="text-xs text-slate-400 mt-2 block">
-                            {notification.time}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="p-4 border-t border-slate-100">
-                  <button
-                    onClick={handleViewAllNotifications}
-                    className="w-full py-2.5 text-center text-sky-600 hover:text-sky-700 font-medium rounded-lg hover:bg-sky-50 transition"
-                  >
-                    View All Notifications
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
           {/* Profile menu */}
           <div className="relative" ref={profileMenuRef}>
             <button
@@ -367,7 +225,7 @@ const Navbar = ({ user, logout }) => {
                 <div className="py-2">
                   <button
                     onClick={() => {
-                      alert("Opening profile...");
+                      navigate("/profile");
                       setShowProfileMenu(false);
                     }}
                     className="w-full px-4 py-3 text-left text-slate-700 hover:bg-slate-50 flex items-center gap-3"
@@ -387,31 +245,7 @@ const Navbar = ({ user, logout }) => {
                     </svg>
                     <span>My Profile</span>
                   </button>
-                  <button
-                    onClick={handleSettings}
-                    className="w-full px-4 py-3 text-left text-slate-700 hover:bg-slate-50 flex items-center gap-3"
-                  >
-                    <svg
-                      className="h-5 w-5 text-slate-400"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                    </svg>
-                    <span>Settings</span>
-                  </button>
+
                   <button
                     onClick={() => {
                       navigate("/");

@@ -147,6 +147,10 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateUser = (updatedUser) => {
+    setUser(updatedUser);
+  };
+
   const value = {
     user,
     loading,
@@ -158,6 +162,7 @@ export const AuthProvider = ({ children }) => {
     resetPasswordConfirm,
     sendContactMessage,
     googleLogin,
+    updateUser,
     setError,
   };
 
