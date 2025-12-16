@@ -1,14 +1,17 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import AuthLayout from "./AuthLayout";
+import { Mail } from "lucide-react";
 
 const ResetPassword = () => {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [resetUrl, setResetUrl] = useState(null);
+  const [emailSent, setEmailSent] = useState(false);
   const { resetPassword, error, setError } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,86 +20,133 @@ const ResetPassword = () => {
     setMessage("");
     setResetUrl(null);
 
+    if (!email || !email.includes("@")) {
+      setError("Please enter a valid email address");
+      setIsLoading(false);
+      return;
+    }
+
     const result = await resetPassword(email);
     setIsLoading(false);
 
     if (result.success) {
       setMessage(result.message);
+      setEmailSent(true);
+
+      // If in development mode and resetUrl is provided
       if (result.resetUrl) {
         setResetUrl(result.resetUrl);
       }
+
+      // Clear form
+      setEmail("");
     }
   };
 
   return (
     <AuthLayout
-      title="Reset Password"
-      subtitle="Enter your email to reset password"
+      title="Reset Your Password"
+      subtitle="Enter your email to receive password reset instructions"
       footerText="Remember your password?"
       footerLinkText="Sign in"
       footerLinkTo="/login"
     >
-      <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">
-            {error}
+          <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-lg text-sm">
+            <p className="font-medium">Error</p>
+            <p>{error}</p>
           </div>
         )}
 
-        {message && (
-          <div className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg">
-            {message}
+        {message && emailSent && (
+          <div className="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 rounded-lg text-sm">
+            <p className="font-medium mb-2">✓ Email Sent Successfully</p>
+            <p>{message}</p>
             {resetUrl && (
-              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-xs font-bold uppercase tracking-wider text-blue-700 mb-1">Development / Antivirus Fallback</p>
-                <p className="text-sm text-blue-800 mb-2">
-                  Since actual email sending was blocked (likely by antivirus), here is the link:
+              <div className="mt-3 p-3 bg-green-100 rounded text-green-800 break-all">
+                <p className="text-xs font-semibold mb-1">
+                  Development Mode - Reset Link:
                 </p>
                 <a
                   href={resetUrl}
-                  className="block w-full text-center bg-blue-600 text-white font-semibold py-2 rounded-md hover:bg-blue-700 transition"
+                  className="text-blue-600 hover:underline text-xs"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  Reset Password Now
+                  {resetUrl}
                 </a>
               </div>
             )}
           </div>
         )}
 
-        <div>
-          <label
-            htmlFor="email"
-            className="block text-sm font-medium text-gray-700 mb-1"
+        {!emailSent && (
+          <>
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-semibold text-gray-800 mb-2"
+              >
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
+                <input
+                  id="email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full pl-10 pr-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all duration-200 bg-gray-50/50 hover:bg-gray-50"
+                  placeholder="your.email@example.com"
+                />
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                We'll send you a link to reset your password
+              </p>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-2.5 px-4 rounded-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-sm"
+            >
+              {isLoading ? "Sending..." : "Send Reset Link"}
+            </button>
+          </>
+        )}
+
+        {emailSent && (
+          <button
+            type="button"
+            onClick={() => {
+              setEmailSent(false);
+              setMessage("");
+              setResetUrl(null);
+            }}
+            className="w-full bg-gray-200 text-gray-800 py-2.5 px-4 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400/30 transition-all duration-200 font-semibold text-sm"
           >
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-            placeholder="youremail@example.com"
-          />
+            Reset Another Account
+          </button>
+        )}
+
+        <div className="relative py-3">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-300"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-2 bg-white text-gray-500">Or</span>
+          </div>
         </div>
 
         <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          type="button"
+          onClick={() => navigate("/login")}
+          className="w-full border-2 border-gray-300 text-gray-700 py-2.5 px-4 rounded-lg hover:border-gray-400 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 font-semibold text-sm"
         >
-          {isLoading ? "Sending..." : "Reset Password"}
+          Back to Sign In
         </button>
-
-        <div className="text-center">
-          <Link
-            to="/login"
-            className="text-sm text-blue-600 hover:text-blue-800 transition"
-          >
-            ← Back to login
-          </Link>
-        </div>
       </form>
     </AuthLayout>
   );
