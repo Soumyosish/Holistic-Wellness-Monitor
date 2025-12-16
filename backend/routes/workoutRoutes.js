@@ -1,14 +1,25 @@
-// routes/workoutRoutes.js
 import express from "express";
-import { addWorkout, getWorkouts, deleteWorkout } from "../controllers/workoutController.js";
+import {
+  getWorkouts,
+  addWorkout,
+  deleteWorkout,
+  getExercises,
+  addExercise,
+  seedExercises // Keep public or protect? Protect is better.
+} from "../controllers/workoutController.js";
 import { protect } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
-router.use(protect);
+// Exercises (Public or Protected)
+router.get("/exercises", protect, getExercises);
+router.post("/exercises", protect, addExercise);
+router.post("/exercises/seed", seedExercises); // Call once to init
 
-router.post("/", addWorkout);
+// Workouts
+router.use(protect);
 router.get("/", getWorkouts);
+router.post("/", addWorkout);
 router.delete("/:id", deleteWorkout);
 
 export default router;
