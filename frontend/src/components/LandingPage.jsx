@@ -975,7 +975,7 @@ const FAQSection = () => {
     {
       question: "How does Holistic Wellness Monitor track my health data?",
       answer:
-        "Our platform integrates seamlessly with popular wearable devices like Apple Watch, Fitbit, and Garmin, as well as apps like Google Fit. It aggregates real-time data on steps, heart rate, sleep quality, and active calories to provide a unified health dashboard.",
+        "Our platform integrates seamlessly with popular apps like Google Fit. It aggregates real-time data on steps, heart rate, sleep quality, and active calories to provide a unified health dashboard.",
     },
     {
       question: "Is my personal health data secure and private?",
@@ -985,22 +985,17 @@ const FAQSection = () => {
     {
       question: "Can I generate reports to share with my doctor?",
       answer:
-        "Absolutely. You can generate comprehensive PDF health reports with a single click. These reports include trends, vital signs history, and anomaly detection summaries, making it easy for your healthcare provider to understand your long-term health journey.",
+        "Absolutely. You can generate comprehensive PDF health reports with a single click. These reports include trends, vital signs history, and anomaly detection summaries, making it easy for your healthcare provider to understand your long-term health journey. We are implementing it to be updated in the future",
     },
     {
-      question: "Is there a mobile app available?",
+      question: "What are the feature present in the website",
       answer:
-        "Yes, Holistic Wellness Monitor is available as a fully native app for both iOS and Android. You can download it today from the App Store and Google Play Store to track your health on the go.",
+        "The user can track steps maintain their health by tracking the daily intake of the food and also have a proper diet plan.",
     },
     {
-      question: "What is the difference between Free and Premium?",
+      question: "Can I solve my doubts?",
       answer:
-        "The Free plan offers basic tracking for steps, water, and sleep. Premium unlocks advanced features like deep sleep analysis, AI-powered health insights, unlimited historical data export, and personalized workout recommendations.",
-    },
-    {
-      question: "Can I export my data?",
-      answer:
-        "Yes, you have full ownership of your data. You can export your entire history in CSV, JSON, or XML formats at any time for your own backups or analysis in other tools.",
+        "Yes, you have full privileged to the chatbot feature where you can ask your doubts for instant support. We are also having the contact form where you can send your query and we will solve it.",
     },
   ];
 
@@ -1427,28 +1422,28 @@ const LandingPage = () => {
                 {
                   rating: "4.8",
                   text: "This app revolutionized how I track my health. The visual insights are stunning and easy to understand.",
-                  author: "Sarah J.",
+                  author: "Sara Ghosh.",
                   role: "Yoga Instructor",
                   color: "bg-orange-500",
                 },
                 {
-                   rating: "4.9",
+                   rating: "4.5",
                    text: "Finally, a wellness monitor that looks as good as it functions. The dark mode is perfect for night checking.",
-                   author: "Michael C.",
+                   author: "Monish Raj",
                    role: "Tech Professional",
                    color: "bg-blue-500",
                 },
                  {
                    rating: "4.7",
                    text: "Data security was my main concern, but HWM's transparent privacy policies put me at ease.",
-                   author: "Dr. Emily R.",
+                   author: "Ashok Kumar.",
                    role: "Physician",
                    color: "bg-green-500",
                 },
                  {
                   rating: "4.9",
                   text: "The hydration tracker is a game changer. I've never been this consistent with my water intake.",
-                  author: "David K.",
+                  author: "Sivan Singh.",
                   role: "Athlete",
                    color: "bg-cyan-500",
                 },
