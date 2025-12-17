@@ -9,6 +9,7 @@ import TodaysMeals from "./TodaysMeals";
 import MacroChartWidget from "./MacroChartWidget";
 import WaterTracker from "./WaterTracker";
 import SleepTracker from "./SleepTracker";
+import WorkoutWidget from "./WorkoutWidget";
 import GamificationWidget from "./GamificationWidget";
 import ChatBot from "./ChatBot";
 import ScrollToTop from "./ScrollToTop";
@@ -35,10 +36,11 @@ function DashBoard() {
           <GamificationWidget />
         </div>
 
-        {/* Row 3: Water & Sleep (Compact) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        {/* Row 3: Water, Sleep & Workouts */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           <WaterTracker />
           <SleepTracker />
+          <WorkoutWidget />
         </div>
 
         <ChatBot isOpen={isChatOpen} setIsOpen={setIsChatOpen} />
