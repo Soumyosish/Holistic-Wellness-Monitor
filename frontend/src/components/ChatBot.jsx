@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import { Send, MessageSquare } from "lucide-react";
 import chat from "../assets/chat.png";
+import healthQA from "../data/health-qa.json";
+
 const ChatBot = ({ isOpen, setIsOpen }) => {
   const [messages, setMessages] = useState([
     {
@@ -14,26 +16,53 @@ const ChatBot = ({ isOpen, setIsOpen }) => {
   const [isTyping, setIsTyping] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
+
   const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
   const GEMINI_API_URL =
     "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
   const conversationHistory = useMemo(() => {
     return messages.slice(1).map((message) => ({
       role: message.sender === "doctor" ? "model" : "user",
       parts: [{ text: message.text }],
     }));
   }, [messages]);
+
+  // Local Search Logic
+  const findLocalAnswer = (query) => {
+    if (!healthQA || !healthQA.faqs) return null;
+    
+    const lowerQuery = query.toLowerCase();
+    
+    // 1. Check for exact keyword matches (strong signal)
+    const strongMatch = healthQA.faqs.find(faq => 
+      faq.keywords.some(keyword => lowerQuery.includes(keyword.toLowerCase()))
+    );
+    
+    if (strongMatch) return strongMatch.answer;
+
+    // 2. Check for partial matches in question text (weaker signal)
+    const weakMatch = healthQA.faqs.find(faq => 
+       faq.question.toLowerCase().includes(lowerQuery)
+    );
+
+    return weakMatch ? weakMatch.answer : null;
+  };
+
   const callGeminiAPI = async (userMessage) => {
     if (!GEMINI_API_KEY) {
       console.error("Gemini API Key is missing!");
       return "ERROR: AI service not configured. Please set the VITE_GEMINI_API_KEY.";
     }
+
     const systemInstruction = {
       role: "user",
       parts: [
@@ -44,15 +73,18 @@ const ChatBot = ({ isOpen, setIsOpen }) => {
         },
       ],
     };
+
     const currentMessage = {
       role: "user",
       parts: [{ text: userMessage }],
     };
+
     const contents = [
       systemInstruction,
       ...conversationHistory,
       currentMessage,
     ];
+
     try {
       const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
         method: "POST",
@@ -67,6 +99,7 @@ const ChatBot = ({ isOpen, setIsOpen }) => {
           },
         }),
       });
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(
@@ -75,6 +108,7 @@ const ChatBot = ({ isOpen, setIsOpen }) => {
           }`
         );
       }
+
       const data = await response.json();
       return (
         data.candidates?.[0]?.content?.parts?.[0]?.text ||
@@ -82,12 +116,17 @@ const ChatBot = ({ isOpen, setIsOpen }) => {
       );
     } catch (error) {
       console.error("Error calling Gemini API:", error);
-      return `I'm having trouble connecting to my knowledge base. Error: ${error.message}. Please check your API key and network connection.`;
+      // If API fails, check if we might want to suggest looking at FAQs
+      return `I'm having trouble connecting to my live knowledge base currently (Quota/Network Error). 
+      
+      However, for general health inquiries like "protein", "sleep", or "hydration", I can still assist you. Try asking about those topics!`;
     }
   };
+
   const handleSendMessage = async () => {
     const messageText = newMessage.trim();
     if (!messageText) return;
+
     const userMessage = {
       id: Date.now(),
       sender: "user",
@@ -97,57 +136,63 @@ const ChatBot = ({ isOpen, setIsOpen }) => {
         minute: "2-digit",
       }),
     };
+
     setMessages((prev) => [...prev, userMessage]);
     setNewMessage("");
     setIsTyping(true);
     setIsLoading(true);
+
+    // Artificial delay for realism
     setTimeout(async () => {
-      try {
-        const aiResponse = await callGeminiAPI(messageText);
-        const aiMessage = {
-          id: Date.now() + 1,
-          sender: "doctor", // Use 'doctor' for UI styling
-          text: aiResponse,
-          time: new Date().toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-        };
-        setMessages((prev) => [...prev, aiMessage]);
-      } catch (error) {
-        console.error("Error in chat processing:", error);
-        const errorMessage = {
-          id: Date.now() + 1,
-          sender: "doctor",
-          text: "I apologize, an unexpected error occurred while processing your request. Please try again.",
-          time: new Date().toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-        };
-        setMessages((prev) => [...prev, errorMessage]);
-      } finally {
-        setIsTyping(false);
-        setIsLoading(false);
+      let responseText = "";
+      
+      // 1. Try Local Knowledge Base First
+      const localAnswer = findLocalAnswer(messageText);
+
+      if (localAnswer) {
+        console.log("Found local answer for:", messageText);
+        responseText = localAnswer;
+      } else {
+        // 2. Fallback to Gemini API
+        console.log("No local answer found, calling API...");
+        responseText = await callGeminiAPI(messageText);
       }
-    }, 1000);
+
+      const aiMessage = {
+        id: Date.now() + 1,
+        sender: "doctor",
+        text: responseText,
+        time: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      };
+
+      setMessages((prev) => [...prev, aiMessage]);
+      setIsTyping(false);
+      setIsLoading(false);
+    }, 1000); // 1s delay
   };
+
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
   };
+
   const handleQuickQuestion = (question) => {
     setNewMessage(question);
     setTimeout(() => handleSendMessage(), 10);
   };
+
   const quickQuestions = [
-    "What are the symptoms of dehydration?",
+    "How much protein do I need?",
     "How much water should I drink daily?",
-    "What's a good exercise routine?",
+    "What's a good beginner workout?",
     "How to improve sleep quality?",
   ];
+
   return (
     <div className="fixed bottom-6 right-6 z-50">
       {/* Logo/Toggle Button */}
@@ -168,7 +213,8 @@ const ChatBot = ({ isOpen, setIsOpen }) => {
           />
         )}
       </button>
-      {/* Chat Container (Conditional Render) */}
+
+      {/* Chat Container */}
       {isOpen && (
         <div className="absolute bottom-16 right-0 w-[300px] h-[540px] bg-white rounded-2xl shadow-2xl p-4 border border-gray-200 flex flex-col transition-all duration-300 ease-in-out">
           {/* Header */}
@@ -192,6 +238,7 @@ const ChatBot = ({ isOpen, setIsOpen }) => {
               <span className="text-xs text-green-600 font-medium">Online</span>
             </div>
           </div>
+
           {/* Chat Messages Container */}
           <div className="flex-1 overflow-y-auto mb-4 space-y-4 custom-scrollbar">
             {messages.map((message) => (
@@ -244,6 +291,7 @@ const ChatBot = ({ isOpen, setIsOpen }) => {
             )}
             <div ref={messagesEndRef} />
           </div>
+
           {/* Quick Questions */}
           <div className="mb-4">
             <p className="text-xs text-gray-500 mb-2">Quick questions:</p>
@@ -260,6 +308,7 @@ const ChatBot = ({ isOpen, setIsOpen }) => {
               ))}
             </div>
           </div>
+
           {/* Input Area */}
           <div className="mt-auto">
             <div className="flex gap-2">
@@ -288,4 +337,5 @@ const ChatBot = ({ isOpen, setIsOpen }) => {
     </div>
   );
 };
+
 export default ChatBot;

@@ -170,14 +170,14 @@ function WaterTracker() {
       </div>
 
       {/* Weekly Trend Bar Chart */}
-      <div className="relative z-10 px-8 mb-4">
+      <div className="relative z-10 px-8 mb-4 w-full">
         <div className="flex justify-between items-end mb-3">
           <div className="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
             <TrendingUp size={12} /> 7 Day Trend
           </div>
         </div>
 
-        <div className="h-24 w-full bg-white/50 rounded-2xl border border-white p-2 shadow-sm">
+        <div className="h-32 w-full bg-white/50 rounded-2xl border border-white p-2 shadow-sm min-h-[120px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={weeklyData}

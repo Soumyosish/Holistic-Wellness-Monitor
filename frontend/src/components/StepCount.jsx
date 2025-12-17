@@ -148,11 +148,8 @@ const StepCount = () => {
       // Refresh weekly history after sync
       await fetchWeeklyStepHistory();
     } catch (error) {
-      console.error("Error syncing steps from backend:", error);
-      if (error.response?.status === 400 || error.response?.status === 401) {
-        // Token issue or not connected
-        setIsConnected(false);
-      }
+      console.warn("Step sync failed (likely Google Fit not configured):", error.message);
+      setIsConnected(false); // Assume disconnected on error to prevent loops
     } finally {
       setIsSyncing(false);
     }

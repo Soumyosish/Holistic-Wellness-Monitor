@@ -209,14 +209,14 @@ function SleepTracker() {
       </div>
 
       {/* Modern Bar Chart */}
-      <div className="flex-1 min-h-[140px] flex flex-col z-10">
+      <div className="flex-1 min-h-[200px] flex flex-col z-10 w-full">
         <div className="flex justify-between items-end mb-4">
           <div className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
             <TrendingUp size={12} /> 7 Day Trend
           </div>
         </div>
 
-        <div className="flex-1 w-full bg-white/50 rounded-2xl border border-white p-2 shadow-sm">
+        <div className="flex-1 w-full bg-white/50 rounded-2xl border border-white p-2 shadow-sm min-h-[150px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={weeklyData}
