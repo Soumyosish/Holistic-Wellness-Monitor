@@ -1,18 +1,18 @@
 import React, { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import Navbar from "./Navbar";
-import BMICalculator from "./BMICalculator";
-import HealthOverview from "./HealthOverview";
-import StepCount from "./StepCount";
-import ProfileSummaryCard from "./ProfileSummaryCard";
-import TodaysMeals from "./TodaysMeals";
-import MacroChartWidget from "./MacroChartWidget";
-import WaterTracker from "./WaterTracker";
-import SleepTracker from "./SleepTracker";
-import WorkoutWidget from "./WorkoutWidget";
-import GamificationWidget from "./GamificationWidget";
-import ChatBot from "./ChatBot";
-import ScrollToTop from "./ScrollToTop";
+import Navbar from "../components/layout/Navbar";
+import BMICalculator from "../components/common/BMICalculator";
+import HealthOverview from "../components/dashboard/HealthOverview";
+import StepCount from "../components/trackers/StepCount";
+import ProfileSummaryCard from "../components/dashboard/ProfileSummaryCard";
+import TodaysMeals from "../components/trackers/TodaysMeals";
+import MacroChartWidget from "../components/dashboard/MacroChartWidget";
+import WaterTracker from "../components/trackers/WaterTracker";
+import SleepTracker from "../components/trackers/SleepTracker";
+import WorkoutWidget from "../components/dashboard/WorkoutWidget";
+import GamificationWidget from "../components/dashboard/GamificationWidget";
+import ChatBot from "../components/layout/ChatBot";
+import ScrollToTop from "../components/layout/ScrollToTop";
 import "../index.css";
 
 function DashBoard() {

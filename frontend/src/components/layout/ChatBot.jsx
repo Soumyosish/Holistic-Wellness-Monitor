@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import { Send, MessageSquare } from "lucide-react";
-import chat from "../assets/chat.png";
-import healthQA from "../data/health-qa.json";
+import chat from "../../assets/chat.png";
+import healthQA from "../../data/health-qa.json";
 
 const ChatBot = ({ isOpen, setIsOpen }) => {
   const [messages, setMessages] = useState([

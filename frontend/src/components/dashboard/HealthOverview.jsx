@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import heart from "../assets/heart.jpg";
-import bloodsugar from "../assets/bloodsugar.jpg";
-import bloodpressure from "../assets/bloodpressure.webp";
-import heartRate from "../assets/heartrate.jpg";
+import heart from "../../assets/heart.jpg";
+import bloodsugar from "../../assets/bloodsugar.jpg";
+import bloodpressure from "../../assets/bloodpressure.webp";
+import heartRate from "../../assets/heartrate.jpg";
 const HealthOverview = () => {
   const [metrics, setMetrics] = useState({
     bloodSugar: 80,

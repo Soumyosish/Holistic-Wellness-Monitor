@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import MacroChart from "./MacroChart";
+import MacroChart from "../common/MacroChart";
 
 function MacroChartWidget() {
   const [totals, setTotals] = useState({ protein: 0, carbs: 0, fats: 0 });

@@ -6,18 +6,18 @@ import {
   Navigate,
 } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
-import LandingPage from "./components/LandingPage";
-import Dashboard from "./components/DashBoard";
-import Login from "./components/auth/Login";
-import Register from "./components/auth/Register";
-import ResetPassword from "./components/auth/ResetPassword";
-import ResetPasswordConfirm from "./components/auth/ResetPasswordConfirm";
-import ProtectedRoute from "./components/ProtectedRoute";
-import GoogleCallback from "./components/auth/GoogleCallback";
-import UserProfile from "./components/UserProfile";
-import MealTracker from "./components/MealTracker";
-import WorkoutTracker from "./components/WorkoutTracker";
-import ProgressGraphs from "./components/ProgressGraphs";
+import LandingPage from "./pages/LandingPage";
+import Dashboard from "./pages/DashBoard";
+import Login from "./pages/auth/Login";
+import Register from "./pages/auth/Register";
+import ResetPassword from "./pages/auth/ResetPassword";
+import ResetPasswordConfirm from "./pages/auth/ResetPasswordConfirm";
+import ProtectedRoute from "./components/layout/ProtectedRoute";
+import GoogleCallback from "./pages/auth/GoogleCallback";
+import UserProfile from "./pages/UserProfile";
+import MealTracker from "./pages/MealTracker";
+import WorkoutTracker from "./pages/WorkoutTracker";
+import ProgressGraphs from "./pages/ProgressGraphs";
 
 const App = () => {
   return (

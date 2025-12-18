@@ -10,7 +10,7 @@ import {
   CartesianGrid,
 } from "recharts";
 import axios from "axios";
-import foot from "../assets/foot.png";
+import foot from "../../assets/foot.png";
 
 const StepCount = () => {
   const [steps, setSteps] = useState(0);

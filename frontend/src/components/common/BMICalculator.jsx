@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import body from "../assets/humanbody.png";
+import body from "../../assets/humanbody.png";
 const BMI_CATEGORIES = {
   underweight: {
     label: "Underweight",

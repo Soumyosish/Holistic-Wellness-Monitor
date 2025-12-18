@@ -8,6 +8,11 @@ import {
   Droplet,
   Footprints,
   Flame,
+  TrendingDown,
+  ChevronsDown,
+  Minus,
+  Dumbbell,
+  TrendingUp,
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import axios from "axios";
@@ -28,7 +33,22 @@ import {
   DIET_TYPES,
   BUDGETS,
   getBMICategory,
+  calculateBMI,
+  calculateBMR,
+  calculateTDEE,
+  calculateIdealWeight,
+  calculateDailyCalorieTarget,
+  calculateMacroTargets,
+  calculateWaterGoal,
+  calculateStepGoal,
 } from "../utils/fitnessCalculators";
+const GOAL_ICONS = {
+  TrendingDown,
+  ChevronsDown,
+  Minus,
+  Dumbbell,
+  TrendingUp,
+};
 
 export default function UserProfile() {
   const { user, updateUser } = useAuth();
@@ -82,6 +102,29 @@ export default function UserProfile() {
           dailyFatsTarget: user.dailyFatsTarget,
           dailyWaterGoal: user.dailyWaterGoal,
           dailyStepGoal: user.dailyStepGoal,
+        });
+      } else if (user.age && user.height && user.weight && user.gender) {
+        // Fallback: calculate locally if data is present but metrics aren't
+        const bmi = calculateBMI(user.weight, user.height);
+        const bmr = calculateBMR(user.weight, user.height, user.age, user.gender);
+        const tdee = calculateTDEE(bmr, user.activityLevel || "moderate");
+        const idealWeight = calculateIdealWeight(user.height, user.gender);
+        const dailyCalorieTarget = calculateDailyCalorieTarget(tdee, user.goal || "maintenance");
+        const macros = calculateMacroTargets(dailyCalorieTarget, user.goal || "maintenance");
+        const dailyWaterGoal = calculateWaterGoal(user.weight, user.activityLevel || "moderate");
+        const dailyStepGoal = calculateStepGoal(user.activityLevel || "moderate");
+
+        setCalculatedMetrics({
+          bmi,
+          bmr,
+          tdee,
+          idealWeight,
+          dailyCalorieTarget,
+          dailyProteinTarget: macros.protein,
+          dailyCarbsTarget: macros.carbs,
+          dailyFatsTarget: macros.fats,
+          dailyWaterGoal,
+          dailyStepGoal,
         });
       }
 
@@ -418,16 +461,43 @@ export default function UserProfile() {
                                 onChange={handleInputChange}
                                 className="hidden"
                               />
-                              <Icon
-                                className={
-                                  formData.goal === key
-                                    ? "text-emerald-500"
-                                    : "text-slate-400"
-                                }
-                                size={20}
-                              />
-                              <div className="font-semibold text-slate-800">
-                                {label}
+                              <div className="flex items-center gap-3">
+                                {Icon && typeof Icon === "string" ? (
+                                  (() => {
+                                    const IconComponent = GOAL_ICONS[Icon];
+                                    return IconComponent ? (
+                                      <IconComponent
+                                        className={
+                                          formData.goal === key
+                                            ? "text-emerald-500"
+                                            : "text-slate-400"
+                                        }
+                                        size={20}
+                                      />
+                                    ) : (
+                                      <Target
+                                        className={
+                                          formData.goal === key
+                                            ? "text-emerald-500"
+                                            : "text-slate-400"
+                                        }
+                                        size={20}
+                                      />
+                                    );
+                                  })()
+                                ) : (
+                                  <Target
+                                    className={
+                                      formData.goal === key
+                                        ? "text-emerald-500"
+                                        : "text-slate-400"
+                                    }
+                                    size={20}
+                                  />
+                                )}
+                                <div className="font-semibold text-slate-800">
+                                  {label}
+                                </div>
                               </div>
                             </label>
                           )

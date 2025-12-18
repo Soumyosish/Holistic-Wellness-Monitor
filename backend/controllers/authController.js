@@ -4,6 +4,16 @@ import crypto from "crypto";
 import User from "../models/User.js";
 import { validationResult } from "express-validator";
 import { sendEmail } from "../utils/emailService.js";
+import {
+  calculateBMI,
+  calculateBMR,
+  calculateTDEE,
+  calculateIdealWeight,
+  calculateDailyCalorieTarget,
+  calculateMacroTargets,
+  calculateWaterGoal,
+  calculateStepGoal,
+} from "../utils/healthCalculations.js";
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -29,6 +39,36 @@ export const register = async (req, res) => {
     }
 
     const hashed = await bcrypt.hash(password, 10);
+    
+    // Default values if data is present
+    let healthData = {};
+    if (age && height && weight && gender) {
+      const bmi = calculateBMI(weight, height);
+      const bmr = calculateBMR(weight, height, age, gender);
+      const tdee = calculateTDEE(bmr, "moderate");
+      const idealWeight = calculateIdealWeight(height, gender);
+      const dailyCalorieTarget = calculateDailyCalorieTarget(tdee, "maintenance");
+      const macroTargets = calculateMacroTargets(dailyCalorieTarget, "maintenance");
+      const dailyWaterGoal = calculateWaterGoal(weight, "moderate");
+      const dailyStepGoal = calculateStepGoal("moderate");
+
+      healthData = {
+        bmi,
+        bmr,
+        tdee,
+        idealWeight,
+        dailyCalorieTarget,
+        dailyProteinTarget: macroTargets.protein,
+        dailyCarbsTarget: macroTargets.carbs,
+        dailyFatsTarget: macroTargets.fats,
+        dailyWaterGoal,
+        dailyStepGoal,
+        profileCompleted: true,
+        activityLevel: "moderate",
+        goal: "maintenance",
+        targetWeight: idealWeight
+      };
+    }
 
     const user = await User.create({
       name,
@@ -38,6 +78,7 @@ export const register = async (req, res) => {
       height,
       weight,
       gender,
+      ...healthData
     });
 
     const token = generateToken(user._id);
@@ -51,6 +92,9 @@ export const register = async (req, res) => {
         height: user.height,
         weight: user.weight,
         gender: user.gender,
+        profileCompleted: user.profileCompleted,
+        bmi: user.bmi,
+        dailyCalorieTarget: user.dailyCalorieTarget,
       },
       token,
     });
@@ -92,6 +136,9 @@ export const login = async (req, res) => {
         height: user.height,
         weight: user.weight,
         gender: user.gender,
+        profileCompleted: user.profileCompleted,
+        bmi: user.bmi,
+        dailyCalorieTarget: user.dailyCalorieTarget,
       },
       token,
     });
