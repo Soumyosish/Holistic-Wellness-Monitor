@@ -36,7 +36,7 @@ Holistic Wellness Monitor is a comprehensive, full-stack health and fitness trac
 
 ### 1. Clone the Repository
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/Soumyosish/Holistic-Wellness-Monitor.git
 cd "Holistic Wellness Monitor"
 ```
 
