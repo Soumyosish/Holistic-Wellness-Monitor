@@ -1178,7 +1178,7 @@ const LandingPage = () => {
         }, 3000);
       }
     } catch (error) {
-      setNewsletterStatus(error.response?.data?.msg || "Subscription failed");
+      setNewsletterStatus(error.response?.data?.msg || "Subscription failed. Please login to subscribe");
       setTimeout(() => {
         setNewsletterStatus("");
       }, 3000);

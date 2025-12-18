@@ -12,7 +12,7 @@ import {
   Flame,
 } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 
 const MEAL_ICONS = {
   breakfast: Coffee,

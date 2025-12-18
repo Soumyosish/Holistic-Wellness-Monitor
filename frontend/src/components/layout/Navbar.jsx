@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import logo from "../assets/logo.jpg";
+import logo from "../../assets/logo.jpg";
 const Navbar = ({ user, logout }) => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
