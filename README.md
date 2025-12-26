@@ -1,6 +1,6 @@
 # Holistic Wellness Monitor 🧘‍♂️ 
 
-Holistic Wellness Monitor is a comprehensive, full-stack health and fitness tracking application designed to help users monitor their physical well-being through meal logging, workout tracking, sleep analysis, and AI-powered health insights.
+Holistic Wellness Monitor is a functional, full-stack health and fitness tracking application designed to help users monitor their physical well-being through meal logging, workout tracking, sleep analysis, and AI-powered health insights.
 
 ---
 
