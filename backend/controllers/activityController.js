@@ -2,20 +2,14 @@ import DailySummary from "../models/DailySummary.js";
 import User from "../models/User.js";
 import { google } from "googleapis";
 
-/**
- * Helper function to get current date in IST timezone (YYYY-MM-DD)
- */
 const getTodayDateIST = () => {
   const now = new Date();
   // Convert to IST (UTC+5:30)
   const istOffset = 5.5 * 60 * 60 * 1000; // 5.5 hours in milliseconds
   const istDate = new Date(now.getTime() + istOffset);
-  return istDate.toISOString().split('T')[0];
+  return istDate.toISOString().split("T")[0];
 };
 
-/**
- * Get today's summary or create if doesn't exist
- */
 export const getTodaySummary = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -27,13 +21,13 @@ export const getTodaySummary = async (req, res) => {
     if (!summary) {
       // Get user's goals
       const user = await User.findById(userId);
-      
+
       summary = await DailySummary.create({
         user: userId,
         date: today,
         waterGoal: user?.dailyWaterGoal || 2000,
         stepGoal: user?.dailyStepGoal || 10000,
-        calorieGoal: user?.dailyCalorieTarget || 2000
+        calorieGoal: user?.dailyCalorieTarget || 2000,
       });
     }
 
@@ -44,9 +38,6 @@ export const getTodaySummary = async (req, res) => {
   }
 };
 
-/**
- * Get summary for a specific date
- */
 export const getSummaryByDate = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -65,9 +56,6 @@ export const getSummaryByDate = async (req, res) => {
   }
 };
 
-/**
- * Update water intake
- */
 export const updateWaterIntake = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -75,8 +63,11 @@ export const updateWaterIntake = async (req, res) => {
     const targetDate = date || getTodayDateIST();
 
     // First, get the current summary to check current water intake
-    let summary = await DailySummary.findOne({ user: userId, date: targetDate });
-    
+    let summary = await DailySummary.findOne({
+      user: userId,
+      date: targetDate,
+    });
+
     if (!summary) {
       // Create new summary if doesn't exist
       const user = await User.findById(userId);
@@ -85,14 +76,14 @@ export const updateWaterIntake = async (req, res) => {
         date: targetDate,
         waterGoal: user?.dailyWaterGoal || 2000,
         stepGoal: user?.dailyStepGoal || 10000,
-        calorieGoal: user?.dailyCalorieTarget || 2000
+        calorieGoal: user?.dailyCalorieTarget || 2000,
       });
     }
 
     // Calculate new water intake and ensure it doesn't go below 0
     const currentWater = summary.waterIntake || 0;
     const newWaterIntake = Math.max(0, currentWater + amount);
-    
+
     // Update with the validated value
     summary.waterIntake = newWaterIntake;
     await summary.save();
@@ -104,18 +95,17 @@ export const updateWaterIntake = async (req, res) => {
   }
 };
 
-/**
- * Update step count
- */
 export const updateSteps = async (req, res) => {
   try {
     const userId = req.user._id;
     const { steps, date } = req.body;
     const targetDate = date || getTodayDateIST();
 
+    const validatedSteps = Math.max(0, steps); // Ensure steps are not negative
+
     const summary = await DailySummary.findOneAndUpdate(
       { user: userId, date: targetDate },
-      { steps },
+      { steps: validatedSteps },
       { new: true, upsert: true, setDefaultsOnInsert: true }
     );
 
@@ -126,9 +116,6 @@ export const updateSteps = async (req, res) => {
   }
 };
 
-/**
- * Update sleep data
- */
 export const updateSleep = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -136,8 +123,8 @@ export const updateSleep = async (req, res) => {
     const targetDate = date || getTodayDateIST();
 
     const updateData = {};
-    if (sleepHours !== undefined) updateData.sleepHours = sleepHours;
-    if (sleepQuality !== undefined) updateData.sleepQuality = sleepQuality;
+    if (sleepHours !== undefined) updateData.sleepHours = Math.max(0, sleepHours); // Prevent negative hours
+    if (sleepQuality !== undefined) updateData.sleepQuality = Math.max(0, sleepQuality);
     if (sleepStart) updateData.sleepStart = new Date(sleepStart);
     if (sleepEnd) updateData.sleepEnd = new Date(sleepEnd);
 
@@ -154,18 +141,17 @@ export const updateSleep = async (req, res) => {
   }
 };
 
-/**
- * Update weight
- */
 export const updateWeight = async (req, res) => {
   try {
     const userId = req.user._id;
     const { weight, date } = req.body;
-    const targetDate = date || new Date().toISOString().split('T')[0];
+    const targetDate = date || new Date().toISOString().split("T")[0];
+
+    const validatedWeight = Math.max(0, weight);
 
     const summary = await DailySummary.findOneAndUpdate(
       { user: userId, date: targetDate },
-      { weight },
+      { weight: validatedWeight },
       { new: true, upsert: true, setDefaultsOnInsert: true }
     );
 
@@ -179,9 +165,6 @@ export const updateWeight = async (req, res) => {
   }
 };
 
-/**
- * Get activity history for date range
- */
 export const getActivityHistory = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -204,46 +187,49 @@ export const getActivityHistory = async (req, res) => {
   }
 };
 
-/**
- * Get weekly statistics (last 7 days)
- */
 export const getWeeklyStats = async (req, res) => {
   try {
     const userId = req.user._id;
-    
+
     // Get today's date in IST
     const todayIST = getTodayDateIST();
     const today = new Date(todayIST);
-    
+
     // Calculate 7 days ago in IST
     const sevenDaysAgo = new Date(today);
     sevenDaysAgo.setDate(today.getDate() - 6); // Include today, so -6 days
-    const sevenDaysAgoStr = sevenDaysAgo.toISOString().split('T')[0];
+    const sevenDaysAgoStr = sevenDaysAgo.toISOString().split("T")[0];
 
     // Fetch summaries for the last 7 days
     const summaries = await DailySummary.find({
       user: userId,
-      date: { $gte: sevenDaysAgoStr, $lte: todayIST }
+      date: { $gte: sevenDaysAgoStr, $lte: todayIST },
     }).sort({ date: 1 });
 
     // Calculate averages
-    const avgWaterIntake = summaries.length > 0
-      ? summaries.reduce((sum, s) => sum + (s.waterIntake || 0), 0) / summaries.length
-      : 0;
-    
-    const avgSleepHours = summaries.length > 0
-      ? summaries.reduce((sum, s) => sum + (s.sleepHours || 0), 0) / summaries.length
-      : 0;
-    
-    const avgSteps = summaries.length > 0
-      ? summaries.reduce((sum, s) => sum + (s.steps || 0), 0) / summaries.length
-      : 0;
+    const avgWaterIntake =
+      summaries.length > 0
+        ? summaries.reduce((sum, s) => sum + (s.waterIntake || 0), 0) /
+          summaries.length
+        : 0;
+
+    const avgSleepHours =
+      summaries.length > 0
+        ? summaries.reduce((sum, s) => sum + (s.sleepHours || 0), 0) /
+          summaries.length
+        : 0;
+
+    const avgSteps =
+      summaries.length > 0
+        ? summaries.reduce((sum, s) => sum + (s.steps || 0), 0) /
+          summaries.length
+        : 0;
 
     res.json({
       summaries,
       avgWaterIntake: Math.round(avgWaterIntake),
       avgSleepHours: parseFloat(avgSleepHours.toFixed(1)),
-      avgSteps: Math.round(avgSteps)
+      avgSteps: Math.round(avgSteps),
     });
   } catch (error) {
     console.error("Error getting weekly stats:", error);
@@ -251,9 +237,6 @@ export const getWeeklyStats = async (req, res) => {
   }
 };
 
-/**
- * Helper function to create OAuth2 client
- */
 const getOAuth2Client = () => {
   return new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
@@ -262,18 +245,15 @@ const getOAuth2Client = () => {
   );
 };
 
-/**
- * Helper function to refresh access token
- */
 const refreshAccessToken = async (user) => {
   try {
     const oauth2Client = getOAuth2Client();
     oauth2Client.setCredentials({
-      refresh_token: user.googleFitRefreshToken
+      refresh_token: user.googleFitRefreshToken,
     });
 
     const { credentials } = await oauth2Client.refreshAccessToken();
-    
+
     // Update user with new access token
     user.googleFitAccessToken = credentials.access_token;
     user.googleFitTokenExpiry = new Date(credentials.expiry_date);
@@ -286,9 +266,6 @@ const refreshAccessToken = async (user) => {
   }
 };
 
-/**
- * Connect Google Fit - Store OAuth tokens
- */
 export const connectGoogleFit = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -303,7 +280,7 @@ export const connectGoogleFit = async (req, res) => {
       tokens = {
         accessToken: exchangedTokens.access_token,
         refreshToken: exchangedTokens.refresh_token,
-        expiryDate: exchangedTokens.expiry_date
+        expiryDate: exchangedTokens.expiry_date,
       };
     }
 
@@ -317,18 +294,20 @@ export const connectGoogleFit = async (req, res) => {
       {
         googleFitAccessToken: tokens.accessToken,
         googleFitRefreshToken: tokens.refreshToken,
-        googleFitTokenExpiry: tokens.expiryDate ? new Date(tokens.expiryDate) : null,
-        googleFitConnected: true
+        googleFitTokenExpiry: tokens.expiryDate
+          ? new Date(tokens.expiryDate)
+          : null,
+        googleFitConnected: true,
       },
       { new: true }
     );
 
-    res.json({ 
+    res.json({
       msg: "Google Fit connected successfully",
       connected: true,
       user: {
-        googleFitConnected: user.googleFitConnected
-      }
+        googleFitConnected: user.googleFitConnected,
+      },
     });
   } catch (error) {
     console.error("Error connecting Google Fit:", error);
@@ -336,9 +315,6 @@ export const connectGoogleFit = async (req, res) => {
   }
 };
 
-/**
- * Disconnect Google Fit - Remove stored tokens
- */
 export const disconnectGoogleFit = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -347,7 +323,7 @@ export const disconnectGoogleFit = async (req, res) => {
       googleFitAccessToken: null,
       googleFitRefreshToken: null,
       googleFitTokenExpiry: null,
-      googleFitConnected: false
+      googleFitConnected: false,
     });
 
     res.json({ msg: "Google Fit disconnected successfully", connected: false });
@@ -357,17 +333,16 @@ export const disconnectGoogleFit = async (req, res) => {
   }
 };
 
-/**
- * Get Google Fit connection status
- */
 export const getGoogleFitStatus = async (req, res) => {
   try {
     const userId = req.user._id;
-    const user = await User.findById(userId).select('googleFitConnected googleFitTokenExpiry');
+    const user = await User.findById(userId).select(
+      "googleFitConnected googleFitTokenExpiry"
+    );
 
     res.json({
       connected: user.googleFitConnected || false,
-      tokenExpiry: user.googleFitTokenExpiry
+      tokenExpiry: user.googleFitTokenExpiry,
     });
   } catch (error) {
     console.error("Error getting Google Fit status:", error);
@@ -375,9 +350,6 @@ export const getGoogleFitStatus = async (req, res) => {
   }
 };
 
-/**
- * Sync steps from Google Fit
- */
 export const syncGoogleFitSteps = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -400,69 +372,119 @@ export const syncGoogleFitSteps = async (req, res) => {
       access_token: user.googleFitAccessToken,
     });
 
-    const fitness = google.fitness({ version: 'v1', auth: oauth2Client });
+    const fitness = google.fitness({ version: "v1", auth: oauth2Client });
 
     // Get today's date elements in IST
     const getISTDateParts = (date) => {
-      const parts = new Intl.DateTimeFormat('en-CA', { 
-        timeZone: 'Asia/Kolkata',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
+      const parts = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Asia/Kolkata",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
       }).formatToParts(date);
-      
-      const year = parts.find(p => p.type === 'year').value;
-      const month = parts.find(p => p.type === 'month').value;
-      const day = parts.find(p => p.type === 'day').value;
+
+      const year = parts.find((p) => p.type === "year").value;
+      const month = parts.find((p) => p.type === "month").value;
+      const day = parts.find((p) => p.type === "day").value;
       return { year, month, day };
     };
 
     const now = new Date();
     const { year, month, day } = getISTDateParts(now);
     const todayIST = `${year}-${month}-${day}`;
-    
+
     // Construct exact ISO strings with +05:30 offset
     // This creates unambiguous moments in time
     const todayEndString = `${year}-${month}-${day}T23:59:59.999+05:30`;
     const endTimeMillis = new Date(todayEndString).getTime();
-    
+
     // Calculate 6 days ago
     const todayDateObj = new Date(todayEndString); // This reads it as the correct moment
     const sevenDaysAgoObj = new Date(todayDateObj);
     sevenDaysAgoObj.setDate(todayDateObj.getDate() - 6);
-    
+
     // Get IST parts for the start date
     const startParts = getISTDateParts(sevenDaysAgoObj);
     const startDateString = `${startParts.year}-${startParts.month}-${startParts.day}T00:00:00.000+05:30`;
     const startTimeMillis = new Date(startDateString).getTime();
+    // Calculate IST-aligned timestamps using pure UTC math
+    // Goal: Align buckets to IST Midnight (18:30 UTC of previous day)
+    
+    // Get current UTC timestamp
+    const nowUTC = now.getTime();
+    
+    // IST Offset in millis
+    const IST_OFFSET = 5.5 * 60 * 60 * 1000;
+    
+    // Calculate "Current IST Time" in millis (conceptually)
+    const nowIST = nowUTC + IST_OFFSET;
+    
+    // Find the end of today in IST (next midnight)
+    // Floor to day boundary
+    const millisPerDay = 24 * 60 * 60 * 1000;
+    const todayStartIST = Math.floor(nowIST / millisPerDay) * millisPerDay;
+    const todayEndIST = todayStartIST + millisPerDay;
+    
+    // Convert back to UTC epoch
+    // IST Midnight = UTC 18:30 (prev day). 
+    // If todayStartIST is aligned to 00:00, subtracting offset gives UTC epoch
+    const todayStartEpoch = todayStartIST - IST_OFFSET;
+    const todayEndEpoch = todayEndIST - IST_OFFSET; // End of today (23:59:59.999 approx)
+    
+    // We want 7 days history relative to TODAY
+    // Start Time = Today Start - 6 days
+    // const startTimeMillis = todayStartEpoch - (6 * millisPerDay);  <-- REMOVED DUPLICATE
+    // const endTimeMillis = todayEndEpoch; // Includes all of today    <-- REMOVED DUPLICATE
 
     // Fetch step data from Google Fit for last 7 days
     const response = await fitness.users.dataset.aggregate({
-      userId: 'me',
+      userId: "me",
       requestBody: {
+        aggregateBy: [
+          {
+            dataTypeName: "com.google.step_count.delta",
+          },
+        ],
+        bucketByTime: { durationMillis: 24 * 60 * 60 * 1000 },
         aggregateBy: [{
           dataTypeName: 'com.google.step_count.delta',
         }],
-        bucketByTime: { durationMillis: 24 * 60 * 60 * 1000 },
+        bucketByTime: { durationMillis: millisPerDay },
         startTimeMillis,
         endTimeMillis,
       },
     });
 
     let todaySteps = 0;
-    const istOffset = 19800000; // 5.5 * 60 * 60 * 1000
+    
+    // Convert today's IST start to string YYYY-MM-DD for comparison
+    const todayDateObjForSteps = new Date(todayStartIST); // Renamed to avoid conflict
+    const todayISO = new Date(nowUTC + IST_OFFSET).toISOString().split('T')[0];
 
     // Process each daily bucket
     if (response.data.bucket) {
       for (const bucket of response.data.bucket) {
         let dailySteps = 0;
         const bucketStartTime = parseInt(bucket.startTimeMillis);
-        
+
         // Determine the date of this bucket in IST
         // Center of the bucket check to avoid edge cases
-        const midBucketTime = bucketStartTime + (12 * 60 * 60 * 1000);
+        const midBucketTime = bucketStartTime + 12 * 60 * 60 * 1000;
         const { year, month, day } = getISTDateParts(new Date(midBucketTime));
-        const bucketDate = `${year}-${month}-${day}`;
+        
+        // Calculate the central date of this bucket in IST coordinates
+        // Bucket Start (UTC) + Offset = Bucket Start (IST)
+        // This should be 00:00:00 IST
+        const bucketStartIST = bucketStartTime + IST_OFFSET;
+        
+        // create Date object from this "IST timestamp"
+        // standard Date methods on this will give UTC breakdown which matches IST date elements
+        // e.g. 00:00 IST (representation) -> Date(00:00).getUTCHours() === 0
+        const dateObj = new Date(bucketStartIST);
+        const yearVal = dateObj.getUTCFullYear(); // Renamed to avoid conflict with upper scope year
+        const monthVal = String(dateObj.getUTCMonth() + 1).padStart(2, '0');
+        const dayVal = String(dateObj.getUTCDate()).padStart(2, '0');
+        const bucketDate = `${yearVal}-${monthVal}-${dayVal}`;
 
         const datasets = bucket.dataset || [];
         datasets.forEach((ds) => {
@@ -480,21 +502,21 @@ export const syncGoogleFitSteps = async (req, res) => {
           { new: true, upsert: true, setDefaultsOnInsert: true }
         );
 
-        if (bucketDate === todayIST) {
+        if (bucketDate === todayISO) {
           todaySteps = dailySteps;
         }
       }
     }
 
     // Get the updated summary for today
-    const summary = await DailySummary.findOne({ user: userId, date: todayIST });
+    // Removed duplicate declaration and query here, sticking to one consistent query
+    const summary = await DailySummary.findOne({ user: userId, date: todayISO }); 
 
     res.json({
       steps: todaySteps,
       lastSync: new Date(),
-      summary
+      summary,
     });
-
   } catch (error) {
     console.error("Error syncing Google Fit steps:", error);
     res.status(500).json({ msg: "Failed to sync Google Fit data" });

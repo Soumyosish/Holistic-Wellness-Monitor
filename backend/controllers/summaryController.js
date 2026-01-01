@@ -13,13 +13,22 @@ export const getSummaryByDate = async (req, res) => {
 
     // if not exist create from meals/workouts
     const start = new Date(date);
-    const end = new Date(start.getTime() + 24*60*60*1000);
+    const end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
 
-    const meals = await Meal.find({ user: req.user._id, date: { $gte: start, $lt: end }});
-    const workouts = await Workout.find({ user: req.user._1d, date: { $gte: start, $lt: end }});
+    const meals = await Meal.find({
+      user: req.user._id,
+      date: { $gte: start, $lt: end },
+    });
+    const workouts = await Workout.find({
+      user: req.user._1d,
+      date: { $gte: start, $lt: end },
+    });
 
-    const caloriesConsumed = meals.reduce((s,m)=> s + (m.calories || 0), 0);
-    const caloriesBurned = workouts.reduce((s,w)=> s + (w.caloriesBurned || 0), 0);
+    const caloriesConsumed = meals.reduce((s, m) => s + (m.calories || 0), 0);
+    const caloriesBurned = workouts.reduce(
+      (s, w) => s + (w.caloriesBurned || 0),
+      0
+    );
 
     const newSummary = await DailySummary.create({
       user: req.user._id,
@@ -27,7 +36,7 @@ export const getSummaryByDate = async (req, res) => {
       caloriesConsumed,
       caloriesBurned,
       waterIntake: 0,
-      steps: 0
+      steps: 0,
     });
 
     res.json(newSummary);

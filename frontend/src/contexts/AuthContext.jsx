@@ -85,15 +85,14 @@ export const AuthProvider = ({ children }) => {
   const resetPassword = async (email) => {
     try {
       setError(null);
-      // Use the new route structure
       const response = await axios.post(
         `${API_BASE_URL}/auth/forgot-password`,
         { email }
       );
       return {
         success: true,
-        message: response.data.data, // 'Password reset email sent'
-        resetUrl: response.data.resetUrl, // Dev mode link
+        message: response.data.message,
+        resetUrl: response.data.resetUrl,
       };
     } catch (error) {
       const message = error.response?.data?.msg || "Reset password failed";

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import logo from "../assets/logo.jpg";
+import logo from "../../assets/logo.jpg";
 const Navbar = ({ user, logout }) => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
@@ -45,8 +45,6 @@ const Navbar = ({ user, logout }) => {
     navigate("/");
   };
 
-
-
   // Get user initials for avatar
   const getUserInitials = () => {
     if (!user || !user.name) return "U";
@@ -81,20 +79,24 @@ const Navbar = ({ user, logout }) => {
       <div className="w-full max-w-7xl flex items-center justify-between rounded-3xl bg-white/90 backdrop-blur-xl shadow-lg px-3 sm:px-6 py-2 sm:py-3">
         {/* Left: Logo + App name */}
         <div className="flex items-center gap-2 sm:gap-3">
-          <button 
-            onClick={() => navigate('/')}
+          <button
+            onClick={() => navigate("/")}
             className="p-1.5 sm:p-2 rounded-full text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-300 mr-1 sm:mr-2"
             aria-label="Back to Home"
           >
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              className="h-5 w-5 sm:h-6 sm:w-6" 
-              fill="none" 
-              viewBox="0 0 24 24" 
-              stroke="currentColor" 
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 sm:h-6 sm:w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
               strokeWidth={2}
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
             </svg>
           </button>
 
@@ -318,206 +320,6 @@ const Navbar = ({ user, logout }) => {
         </div>
       </div>
 
-      {/* Mobile menu overlay */}
-      {showMobileMenu && (
-        <div
-          className="lg:hidden fixed inset-0 bg-black/40 z-30"
-          onClick={() => setShowMobileMenu(false)}
-        />
-      )}
-
-      {/* Mobile menu */}
-      <div
-        ref={mobileMenuRef}
-        className={`lg:hidden fixed top-0 right-0 h-full w-64 bg-white shadow-xl z-40 transform transition-transform duration-300 ${
-          showMobileMenu ? "translate-x-0" : "translate-x-full"
-        }`}
-      >
-        <div className="p-6 border-b border-slate-200">
-          <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-xl bg-linear-to-tr from-sky-500 to-indigo-500 text-white shadow-md flex items-center justify-center overflow-hidden">
-              <img
-                src={logo}
-                alt="Logo"
-                className="h-full w-full object-cover"
-              />
-            </div>
-            <div>
-              <h2 className="font-bold text-slate-800">Holistic Wellness</h2>
-              <p className="text-xs text-slate-500">Monitor</p>
-            </div>
-          </div>
-        </div>
-        <div className="p-4 space-y-6">
-          {/* Mobile search */}
-          <div>
-            <div className="flex items-center rounded-full bg-slate-100 border border-slate-200 px-4 py-3 gap-3">
-              <svg
-                className="h-4 w-4 text-slate-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <circle cx="11" cy="11" r="7" />
-                <line x1="16.5" y1="16.5" x2="21" y2="21" />
-              </svg>
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search..."
-                className="flex-1 bg-transparent outline-none text-sm text-slate-700"
-              />
-            </div>
-          </div>
-
-          {/* User info in mobile menu */}
-          {user && (
-            <div className="p-3 rounded-lg bg-slate-50">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-linear-to-tr from-sky-400 to-indigo-400 flex items-center justify-center text-sm font-semibold text-white">
-                  {getUserInitials()}
-                </div>
-                <div>
-                  <h4 className="font-medium text-slate-800">
-                    {getUserDisplayName()}
-                  </h4>
-                  <p className="text-xs text-slate-500">{getUserEmail()}</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Mobile nav links */}
-          <nav className="space-y-2">
-            <a
-              href="#"
-              className="flex items-center gap-3 p-3 rounded-lg text-slate-700 hover:bg-slate-100"
-            >
-              <svg
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                />
-              </svg>
-              <span>Dashboard</span>
-            </a>
-            <a
-              href="#"
-              className="flex items-center gap-3 p-3 rounded-lg text-slate-700 hover:bg-slate-100"
-            >
-              <svg
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                />
-              </svg>
-              <span>Health Metrics</span>
-            </a>
-            <a
-              href="#"
-              className="flex items-center gap-3 p-3 rounded-lg text-slate-700 hover:bg-slate-100"
-            >
-              <svg
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <span>Sleep Tracking</span>
-            </a>
-            <a
-              href="#"
-              className="flex items-center gap-3 p-3 rounded-lg text-slate-700 hover:bg-slate-100"
-            >
-              <svg
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <span>Reports</span>
-            </a>
-            <button
-              onClick={() => {
-                navigate("/");
-                setTimeout(() => {
-                  const contactSection = document.getElementById("contact");
-                  if (contactSection)
-                    contactSection.scrollIntoView({ behavior: "smooth" });
-                }, 100);
-                setShowMobileMenu(false);
-              }}
-              className="w-full flex items-center gap-3 p-3 rounded-lg text-slate-700 hover:bg-slate-100 text-left"
-            >
-              <svg
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                />
-              </svg>
-              <span>Contact Us</span>
-            </button>
-          </nav>
-
-          <div className="pt-4 border-t border-slate-200">
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-red-50 text-red-600 hover:bg-red-100"
-            >
-              <svg
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                />
-              </svg>
-              <span>Logout</span>
-            </button>
-          </div>
-        </div>
-      </div>
     </header>
   );
 };

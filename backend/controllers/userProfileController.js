@@ -10,18 +10,24 @@ import {
   calculateStepGoal,
 } from "../utils/healthCalculations.js";
 
-/**
- * Update user profile with health metrics and calculate all derived values
- */
 export const updateProfile = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { age, height, weight, gender, activityLevel, goal, targetWeight, preferences } = req.body;
+    const {
+      age,
+      height,
+      weight,
+      gender,
+      activityLevel,
+      goal,
+      targetWeight,
+      preferences,
+    } = req.body;
 
     // Validate required fields
     if (!age || !height || !weight || !gender) {
-      return res.status(400).json({ 
-        message: "Age, height, weight, and gender are required" 
+      return res.status(400).json({
+        message: "Age, height, weight, and gender are required",
       });
     }
 
@@ -30,9 +36,18 @@ export const updateProfile = async (req, res) => {
     const bmr = calculateBMR(weight, height, age, gender);
     const tdee = calculateTDEE(bmr, activityLevel || "moderate");
     const idealWeight = calculateIdealWeight(height, gender);
-    const dailyCalorieTarget = calculateDailyCalorieTarget(tdee, goal || "maintenance");
-    const macroTargets = calculateMacroTargets(dailyCalorieTarget, goal || "maintenance");
-    const dailyWaterGoal = calculateWaterGoal(weight, activityLevel || "moderate");
+    const dailyCalorieTarget = calculateDailyCalorieTarget(
+      tdee,
+      goal || "maintenance"
+    );
+    const macroTargets = calculateMacroTargets(
+      dailyCalorieTarget,
+      goal || "maintenance"
+    );
+    const dailyWaterGoal = calculateWaterGoal(
+      weight,
+      activityLevel || "moderate"
+    );
     const dailyStepGoal = calculateStepGoal(activityLevel || "moderate");
 
     // Update user profile
@@ -68,13 +83,12 @@ export const updateProfile = async (req, res) => {
     });
   } catch (error) {
     console.error("Error updating profile:", error);
-    res.status(500).json({ message: "Failed to update profile", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to update profile", error: error.message });
   }
 };
 
-/**
- * Get user profile with all calculated metrics
- */
 export const getProfile = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -90,13 +104,12 @@ export const getProfile = async (req, res) => {
     res.status(200).json({ user });
   } catch (error) {
     console.error("Error fetching profile:", error);
-    res.status(500).json({ message: "Failed to fetch profile", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to fetch profile", error: error.message });
   }
 };
 
-/**
- * Recalculate all health metrics based on current profile data
- */
 export const recalculateMetrics = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -109,8 +122,8 @@ export const recalculateMetrics = async (req, res) => {
 
     // Check if user has required data
     if (!user.age || !user.height || !user.weight || !user.gender) {
-      return res.status(400).json({ 
-        message: "Complete your profile first to calculate metrics" 
+      return res.status(400).json({
+        message: "Complete your profile first to calculate metrics",
       });
     }
 
@@ -148,16 +161,13 @@ export const recalculateMetrics = async (req, res) => {
     });
   } catch (error) {
     console.error("Error recalculating metrics:", error);
-    res.status(500).json({ 
-      message: "Failed to recalculate metrics", 
-      error: error.message 
+    res.status(500).json({
+      message: "Failed to recalculate metrics",
+      error: error.message,
     });
   }
 };
 
-/**
- * Update user goals and recalculate targets
- */
 export const updateGoals = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -179,7 +189,10 @@ export const updateGoals = async (req, res) => {
       const tdee = calculateTDEE(user.bmr, user.activityLevel);
       const dailyCalorieTarget = calculateDailyCalorieTarget(tdee, user.goal);
       const macroTargets = calculateMacroTargets(dailyCalorieTarget, user.goal);
-      const dailyWaterGoal = calculateWaterGoal(user.weight, user.activityLevel);
+      const dailyWaterGoal = calculateWaterGoal(
+        user.weight,
+        user.activityLevel
+      );
       const dailyStepGoal = calculateStepGoal(user.activityLevel);
 
       user.tdee = tdee;
@@ -203,13 +216,12 @@ export const updateGoals = async (req, res) => {
     });
   } catch (error) {
     console.error("Error updating goals:", error);
-    res.status(500).json({ message: "Failed to update goals", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to update goals", error: error.message });
   }
 };
 
-/**
- * Update user preferences
- */
 export const updatePreferences = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -223,7 +235,7 @@ export const updatePreferences = async (req, res) => {
 
     // Update preferences
     if (!user.preferences) user.preferences = {};
-    
+
     if (dietType) user.preferences.dietType = dietType;
     if (budget) user.preferences.budget = budget;
     if (allergies) user.preferences.allergies = allergies;
@@ -241,9 +253,9 @@ export const updatePreferences = async (req, res) => {
     });
   } catch (error) {
     console.error("Error updating preferences:", error);
-    res.status(500).json({ 
-      message: "Failed to update preferences", 
-      error: error.message 
+    res.status(500).json({
+      message: "Failed to update preferences",
+      error: error.message,
     });
   }
 };

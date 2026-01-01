@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import body from "../assets/humanbody.png";
+import body from "../../assets/humanbody.png";
 const BMI_CATEGORIES = {
   underweight: {
     label: "Underweight",
@@ -313,7 +313,13 @@ const BMICalculator = () => {
           alt="Holistic Wellness Monitor Logo"
           className="h-full w-full object-cover rounded-xl"
         />
-        <BodyPoint top="25%" left="48%" label="Chest (in)" value="44.5" side="left" />
+        <BodyPoint
+          top="25%"
+          left="48%"
+          label="Chest (in)"
+          value="44.5"
+          side="left"
+        />
         <BodyPoint top="45%" left="48%" label="Waist" value="34" side="left" />
       </div>
     </div>

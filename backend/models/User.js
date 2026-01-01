@@ -12,35 +12,41 @@ const userSchema = new mongoose.Schema(
     gender: { type: String, enum: ["male", "female", "other"] },
     provider: { type: String, enum: ["local", "google"], default: "local" },
     refreshToken: { type: String },
-    
+
     // Google Fit Integration
     googleFitAccessToken: { type: String },
     googleFitRefreshToken: { type: String },
     googleFitTokenExpiry: { type: Date },
     googleFitConnected: { type: Boolean, default: false },
-    
+
     resetPasswordToken: String,
     resetPasswordExpires: Date,
-    
+
     // Activity and Goals
-    activityLevel: { 
-      type: String, 
+    activityLevel: {
+      type: String,
       enum: ["sedentary", "light", "moderate", "active", "extreme"],
-      default: "moderate"
+      default: "moderate",
     },
-    goal: { 
-      type: String, 
-      enum: ["weight_loss", "weight_loss_aggressive", "maintenance", "weight_gain", "muscle_building"],
-      default: "maintenance"
+    goal: {
+      type: String,
+      enum: [
+        "weight_loss",
+        "weight_loss_aggressive",
+        "maintenance",
+        "weight_gain",
+        "muscle_building",
+      ],
+      default: "maintenance",
     },
     targetWeight: Number, // in kg
-    
+
     // Calculated Health Metrics
     bmi: Number,
     bmr: Number, // Basal Metabolic Rate
     tdee: Number, // Total Daily Energy Expenditure
     idealWeight: Number, // in kg
-    
+
     // Daily Targets
     dailyCalorieTarget: Number,
     dailyProteinTarget: Number, // in grams
@@ -48,17 +54,25 @@ const userSchema = new mongoose.Schema(
     dailyFatsTarget: Number, // in grams
     dailyWaterGoal: Number, // in ml
     dailyStepGoal: Number,
-    
+
     // Preferences
     preferences: {
-      dietType: { type: String, enum: ["veg", "non-veg", "vegan", "any"], default: "any" },
-      budget: { type: String, enum: ["low", "medium", "high"], default: "medium" },
+      dietType: {
+        type: String,
+        enum: ["veg", "non-veg", "vegan", "any"],
+        default: "any",
+      },
+      budget: {
+        type: String,
+        enum: ["low", "medium", "high"],
+        default: "medium",
+      },
       allergies: [String],
-      dislikedFoods: [String]
+      dislikedFoods: [String],
     },
-    
+
     // Profile completion status
-    profileCompleted: { type: Boolean, default: false }
+    profileCompleted: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
