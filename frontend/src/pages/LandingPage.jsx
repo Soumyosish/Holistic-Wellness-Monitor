@@ -1332,9 +1332,9 @@ const LandingPage = () => {
             </span>
           </div>
 
-          {/* <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 bg-linear-to-r from-white via-cyan-100 to-indigo-200 bg-clip-text text-transparent min-h-[140px] flex items-center justify-center filter drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]">
+          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 bg-linear-to-r from-white via-cyan-100 to-indigo-200 bg-clip-text text-transparent min-h-[140px] flex items-center justify-center filter drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]">
             <AnimatedText text="Health That Speaks Through Visuals" />
-          </h1> */}
+          </h1>
 
           <p className="text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed animate-fade-in-up opacity-0 animation-delay-2000 font-light">
             Track every heartbeat, step, sleep, and vital sign with real-time
